@@ -55,8 +55,10 @@ Postgres + Caddy auto-HTTPS). Production migrations apply automatically on conta
 
 ## Project docs
 
+- **Overview — what's built & how to run it:** [`docs/OVERVIEW.md`](docs/OVERVIEW.md)
 - Design spec: [`docs/specs/2026-06-18-careerflow-os-design.md`](docs/specs/2026-06-18-careerflow-os-design.md)
-- Implementation plans: [`docs/plans/`](docs/plans/)
+- Specs & implementation plans: [`docs/specs/`](docs/specs/), [`docs/plans/`](docs/plans/)
+- Deploy runbook: [`docs/DEPLOY.md`](docs/DEPLOY.md)
 
 ## Roadmap (deferred until there are real users)
 
