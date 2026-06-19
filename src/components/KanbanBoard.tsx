@@ -4,12 +4,14 @@ import { useState } from "react";
 import {
   DndContext,
   DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
   PointerSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
 import KanbanColumn from "./KanbanColumn";
-import { JobCardData } from "./JobCard";
+import JobCard, { JobCardData, JobCardView } from "./JobCard";
 import { BOARD_COLUMNS } from "@/lib/constants";
 
 interface BoardJob extends JobCardData {
@@ -18,14 +20,18 @@ interface BoardJob extends JobCardData {
 
 export default function KanbanBoard({ initialJobs }: { initialJobs: BoardJob[] }) {
   const [jobs, setJobs] = useState<BoardJob[]>(initialJobs);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
-  // A small activation distance makes drags start crisply (and lets plain
-  // clicks through to the card link).
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
+  function handleDragStart(event: DragStartEvent) {
+    setActiveId(String(event.active.id));
+  }
+
   function handleDragEnd(event: DragEndEvent) {
+    setActiveId(null);
     const jobId = String(event.active.id);
     const newStatus = event.over ? String(event.over.id) : null;
     if (!newStatus) return;
@@ -33,7 +39,6 @@ export default function KanbanBoard({ initialJobs }: { initialJobs: BoardJob[] }
     const job = jobs.find((j) => j.id === jobId);
     if (!job || job.status === newStatus) return;
 
-    // Optimistic update only — persist in the background, no full re-render.
     setJobs((prev) =>
       prev.map((j) => (j.id === jobId ? { ...j, status: newStatus } : j))
     );
@@ -45,8 +50,15 @@ export default function KanbanBoard({ initialJobs }: { initialJobs: BoardJob[] }
     }).catch(() => {});
   }
 
+  const activeJob = activeId ? jobs.find((j) => j.id === activeId) ?? null : null;
+
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragCancel={() => setActiveId(null)}
+    >
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {BOARD_COLUMNS.map((status) => (
           <KanbanColumn
@@ -56,6 +68,9 @@ export default function KanbanBoard({ initialJobs }: { initialJobs: BoardJob[] }
           />
         ))}
       </div>
+      <DragOverlay dropAnimation={null}>
+        {activeJob ? <JobCardView job={activeJob} overlay /> : null}
+      </DragOverlay>
     </DndContext>
   );
 }
