@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/auth";
+import { BoardMockup, WorkspaceMockup, AiMockup } from "@/components/marketing/Mockups";
 
 export const dynamic = "force-dynamic";
 
@@ -39,8 +40,8 @@ export default async function LandingPage() {
         </p>
         <div className="mt-8 flex items-center justify-center gap-3">
           {authed ? (
-            <Link href="/board" className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700">
-              Go to your board
+            <Link href="/home" className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700">
+              Go to your dashboard
             </Link>
           ) : (
             <>
@@ -127,6 +128,47 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* How it works */}
+      <section className="mx-auto max-w-5xl px-6 py-20">
+        <h2 className="text-center text-2xl font-semibold tracking-tight text-zinc-900">
+          How it works
+        </h2>
+        <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          {[
+            { n: "1", t: "Add your jobs", b: "Drop in roles you're applying to and drag them across the pipeline." },
+            { n: "2", t: "Track & research", b: "Log interviews by stage, keep notes, and research each company with AI." },
+            { n: "3", t: "Land it with AI", b: "Score your CV against the job, tailor it, and prep for the interview." },
+          ].map((s) => (
+            <div key={s.n} className="rounded-xl border border-zinc-200 bg-white p-5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
+                {s.n}
+              </div>
+              <h3 className="mt-3 font-medium text-zinc-900">{s.t}</h3>
+              <p className="mt-1.5 text-sm text-zinc-500">{s.b}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Feature deep-dives */}
+      <section className="bg-zinc-50 py-20">
+        <div className="mx-auto flex max-w-5xl flex-col gap-16 px-6">
+          {[
+            { t: "A pipeline that thinks like you do", b: "Drag every application through Wishlist → Applied → Interview → Offer. See your whole search in one glance.", m: <BoardMockup />, flip: false },
+            { t: "An interview workspace per company", b: "Track multi-step interview progress, log each round by stage, and keep prep notes where you need them.", m: <WorkspaceMockup />, flip: true },
+            { t: "AI that sharpens your application", b: "Score your CV against any job, see the keywords you're missing, get tailoring suggestions and interview prep — with your own free key.", m: <AiMockup />, flip: false },
+          ].map((row, i) => (
+            <div key={i} className={`grid items-center gap-8 md:grid-cols-2 ${row.flip ? "md:[&>*:first-child]:order-2" : ""}`}>
+              <div>
+                <h3 className="text-xl font-semibold tracking-tight text-zinc-900">{row.t}</h3>
+                <p className="mt-3 text-zinc-500">{row.b}</p>
+              </div>
+              <div>{row.m}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Pricing */}
       <section className="bg-zinc-50 py-20">
         <div className="mx-auto max-w-4xl px-6">
@@ -144,7 +186,7 @@ export default async function LandingPage() {
                 <li>✓ Dashboard analytics</li>
                 <li>✓ AI features with your own free key</li>
               </ul>
-              <Link href={authed ? "/board" : "/signup"} className="mt-6 block rounded-lg bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-indigo-700">
+              <Link href={authed ? "/home" : "/signup"} className="mt-6 block rounded-lg bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-indigo-700">
                 {authed ? "Go to your board" : "Start free"}
               </Link>
             </div>
@@ -169,6 +211,26 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="mx-auto max-w-3xl px-6 py-20">
+        <h2 className="text-center text-2xl font-semibold tracking-tight text-zinc-900">
+          Frequently asked
+        </h2>
+        <div className="mt-10 flex flex-col gap-4">
+          {[
+            { q: "Is it really free?", a: "Yes — the full job tracker, interviews, CVs, calendar, and dashboard are free. AI features work with your own free API key (Groq or Gemini have free tiers)." },
+            { q: "Do I need an AI key?", a: "No. Every AI feature falls back to useful rule-based logic, so the app is fully usable without any key. Add one when you want smarter results." },
+            { q: "Is my data private?", a: "Your data lives in your own database. If you self-host, it never leaves your server, and AI calls only happen when you click a button — using your key." },
+            { q: "Can I self-host it?", a: "Yes. It ships with a Docker setup (app + Postgres) and a deploy runbook for any VPS." },
+          ].map((f) => (
+            <div key={f.q} className="rounded-xl border border-zinc-200 bg-white p-5">
+              <h3 className="font-medium text-zinc-900">{f.q}</h3>
+              <p className="mt-1.5 text-sm text-zinc-500">{f.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="mx-auto max-w-3xl px-6 py-20 text-center">
         <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
@@ -178,7 +240,7 @@ export default async function LandingPage() {
           Free to start. Set it up in a minute and track your very next application.
         </p>
         <div className="mt-8">
-          <Link href={authed ? "/board" : "/signup"} className="rounded-lg bg-indigo-600 px-6 py-3 text-sm font-medium text-white hover:bg-indigo-700">
+          <Link href={authed ? "/home" : "/signup"} className="rounded-lg bg-indigo-600 px-6 py-3 text-sm font-medium text-white hover:bg-indigo-700">
             {authed ? "Go to your board" : "Start free"}
           </Link>
         </div>
