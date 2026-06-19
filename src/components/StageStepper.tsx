@@ -32,7 +32,7 @@ export default function StageStepper({
         {nextStage && (
           <button
             onClick={() => setStage(nextStage)}
-            className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700"
+            className="rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 shadow-sm shadow-violet-600/20 px-3 py-1.5 text-xs font-medium text-white hover:from-indigo-500 hover:to-violet-500"
           >
             Advance to {STAGE_META[nextStage].label}
           </button>

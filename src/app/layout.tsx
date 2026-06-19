@@ -35,10 +35,11 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 backdrop-blur">
+        <div className="aurora-bar" />
+        <header className="sticky top-0 z-10 border-b border-zinc-200/70 bg-white/70 backdrop-blur-xl">
           <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-6">
             <a href="/" className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600 text-sm font-bold text-white">
+              <span className="brand-gradient flex h-7 w-7 items-center justify-center rounded-lg text-sm font-bold text-white shadow-sm shadow-violet-600/30">
                 C
               </span>
               <span className="font-semibold tracking-tight">CareerFlow OS</span>

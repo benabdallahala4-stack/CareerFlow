@@ -34,16 +34,16 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto max-w-7xl p-6">
-      <h1 className="text-xl font-semibold tracking-tight text-zinc-900">
-        Welcome back, {name}
+      <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+        Welcome back, <span className="brand-text">{name}</span>
       </h1>
       <p className="mt-0.5 text-sm text-zinc-500">Here&apos;s your job search at a glance.</p>
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Applications" value={stats.total} />
-        <StatCard label="Response rate" value={`${stats.responseRate}%`} />
-        <StatCard label="Offers" value={stats.offers} />
-        <StatCard label="Interviews this week" value={stats.interviewsThisWeek} />
+        <StatCard label="Applications" value={stats.total} accent="indigo" />
+        <StatCard label="Response rate" value={`${stats.responseRate}%`} accent="emerald" />
+        <StatCard label="Offers" value={stats.offers} accent="violet" />
+        <StatCard label="Interviews this week" value={stats.interviewsThisWeek} accent="amber" />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">

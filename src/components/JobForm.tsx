@@ -94,7 +94,7 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
       <button
         type="submit"
         disabled={saving || !title}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+        className="rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 shadow-sm shadow-violet-600/20 px-4 py-2 text-sm font-medium text-white transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50"
       >
         {saving ? "Saving…" : isEdit ? "Save changes" : "Add job"}
       </button>

@@ -17,10 +17,10 @@ export default async function DashboardPage() {
       <h1 className="mb-6 text-xl font-semibold tracking-tight text-zinc-900">Dashboard</h1>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Applications" value={stats.total} />
-        <StatCard label="Response rate" value={`${stats.responseRate}%`} hint="interview or offer ÷ applied" />
-        <StatCard label="Offers" value={stats.offers} />
-        <StatCard label="Interviews this week" value={stats.interviewsThisWeek} hint="next 7 days" />
+        <StatCard label="Applications" value={stats.total} accent="indigo" />
+        <StatCard label="Response rate" value={`${stats.responseRate}%`} hint="interview or offer ÷ applied" accent="emerald" />
+        <StatCard label="Offers" value={stats.offers} accent="violet" />
+        <StatCard label="Interviews this week" value={stats.interviewsThisWeek} hint="next 7 days" accent="amber" />
       </div>
 
       <div className="mt-6">
@@ -59,7 +59,7 @@ export default async function DashboardPage() {
             </p>
             <Link
               href="/billing"
-              className="mt-3 inline-block rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+              className="mt-3 inline-block rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 shadow-sm shadow-violet-600/20 px-4 py-2 text-sm font-medium text-white hover:from-indigo-500 hover:to-violet-500"
             >
               Upgrade to Pro
             </Link>
