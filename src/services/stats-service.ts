@@ -46,3 +46,26 @@ export async function computeStats(userId: string): Promise<Stats> {
     interviewsThisWeek,
   };
 }
+
+export interface CvPerformance {
+  label: string;
+  total: number;
+  responded: number;
+  rate: number; // percent
+}
+
+/** Per-CV response rate (jobs that reached INTERVIEW/OFFER ÷ jobs tagged with that CV). */
+export async function bestCvPerformance(userId: string): Promise<CvPerformance[]> {
+  const cvs = await db.cv.findMany({ where: { userId }, select: { id: true, label: true } });
+  const results: CvPerformance[] = [];
+  for (const cv of cvs) {
+    const total = await db.job.count({ where: { userId, cvId: cv.id } });
+    if (total === 0) continue;
+    const responded = await db.job.count({
+      where: { userId, cvId: cv.id, status: { in: ["INTERVIEW", "OFFER"] } },
+    });
+    results.push({ label: cv.label, total, responded, rate: Math.round((responded / total) * 100) });
+  }
+  results.sort((a, b) => b.rate - a.rate);
+  return results;
+}
