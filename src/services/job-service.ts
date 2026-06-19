@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { type JobStatus } from "@/lib/constants";
+import { createNotification } from "./notification-service";
 
 export interface JobInput {
   title: string;
@@ -36,8 +37,31 @@ export function createJob(userId: string, input: JobInput) {
 }
 
 export async function updateJob(userId: string, id: string, input: Partial<JobInput>) {
+  const before = await db.job.findFirst({ where: { id, userId } });
   await db.job.updateMany({ where: { id, userId }, data: input });
-  return db.job.findFirst({ where: { id, userId } });
+  const after = await db.job.findFirst({ where: { id, userId } });
+
+  if (before && after) {
+    if (input.status !== undefined && before.status !== after.status) {
+      await createNotification(userId, {
+        kind: "STATUS_CHANGE",
+        title: `${after.title}: ${before.status} → ${after.status}`,
+        jobId: after.id,
+      });
+    }
+    if (
+      input.currentStage !== undefined &&
+      before.currentStage !== after.currentStage &&
+      after.currentStage
+    ) {
+      await createNotification(userId, {
+        kind: "STAGE_CHANGE",
+        title: `${after.title} advanced to ${after.currentStage}`,
+        jobId: after.id,
+      });
+    }
+  }
+  return after;
 }
 
 export async function updateJobStatus(
@@ -57,6 +81,14 @@ export async function updateJobStatus(
       ...(enteringApplied ? { appliedAt: new Date() } : {}),
     },
   });
+
+  if (current && current.status !== status) {
+    await createNotification(userId, {
+      kind: "STATUS_CHANGE",
+      title: `${current.title}: ${current.status} → ${status}`,
+      jobId: id,
+    });
+  }
   return db.job.findFirst({ where: { id, userId } });
 }
 
