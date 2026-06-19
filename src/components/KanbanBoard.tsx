@@ -38,7 +38,7 @@ export default function KanbanBoard({ initialJobs }: { initialJobs: BoardJob[] }
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="flex gap-3 overflow-x-auto pb-4">
+      <div className="board-scroll flex gap-3 overflow-x-auto pb-4">
         {BOARD_COLUMNS.map((status) => (
           <KanbanColumn
             key={status}

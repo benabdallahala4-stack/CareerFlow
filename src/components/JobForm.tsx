@@ -15,6 +15,9 @@ interface JobFormProps {
   onDone?: () => void;
 }
 
+const inputClass =
+  "w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-800 placeholder:text-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100";
+
 export default function JobForm({ initial, onDone }: JobFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -55,32 +58,34 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <input
-        className="border rounded px-3 py-2"
+        className={inputClass}
         placeholder="Job title *"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
       />
       <input
-        className="border rounded px-3 py-2"
+        className={inputClass}
         placeholder="Job posting URL"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
       />
-      <input
-        className="border rounded px-3 py-2"
-        placeholder="Salary"
-        value={salary}
-        onChange={(e) => setSalary(e.target.value)}
-      />
-      <input
-        className="border rounded px-3 py-2"
-        placeholder="Location"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-      />
+      <div className="flex gap-2">
+        <input
+          className={inputClass}
+          placeholder="Salary"
+          value={salary}
+          onChange={(e) => setSalary(e.target.value)}
+        />
+        <input
+          className={inputClass}
+          placeholder="Location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        />
+      </div>
       <textarea
-        className="border rounded px-3 py-2"
+        className={inputClass}
         placeholder="Description / notes"
         rows={4}
         value={description}
@@ -89,7 +94,7 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
       <button
         type="submit"
         disabled={saving || !title}
-        className="bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
+        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
       >
         {saving ? "Saving…" : isEdit ? "Save changes" : "Add job"}
       </button>
