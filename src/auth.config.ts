@@ -11,7 +11,8 @@ export const authConfig = {
         nextUrl.pathname === "/" ||
         nextUrl.pathname.startsWith("/login") ||
         nextUrl.pathname.startsWith("/signup") ||
-        nextUrl.pathname.startsWith("/api/auth");
+        nextUrl.pathname.startsWith("/api/auth") ||
+        nextUrl.pathname.startsWith("/api/internal"); // guarded by INTERNAL_API_SECRET, not session
       if (isPublic) return true;
       return isAuthed;
     },
