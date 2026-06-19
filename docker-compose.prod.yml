@@ -28,6 +28,7 @@ services:
       DATABASE_URL: postgresql://careerflow:${POSTGRES_PASSWORD:-careerflow}@db:5432/careerflow?schema=public
       AUTH_SECRET: ${AUTH_SECRET}
       AUTH_TRUST_HOST: "true"
+      INTERNAL_API_SECRET: ${INTERNAL_API_SECRET:-change-me-internal}
     volumes:
       - cf_uploads:/app/uploads
     ports:

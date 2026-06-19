@@ -1,0 +1,45 @@
+{
+  "name": "CareerFlow — Gmail email monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": { "item": [{ "mode": "everyMinute" }] },
+        "simple": true,
+        "filters": {}
+      },
+      "id": "gmail-trigger",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [260, 300],
+      "credentials": { "gmailOAuth2": { "id": "REPLACE", "name": "Gmail account" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CAREERFLOW_APP_URL }}/api/internal/process-email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-internal-secret", "value": "={{ $env.INTERNAL_API_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"userId\": \"REPLACE_WITH_YOUR_USER_ID\", \"from\": $json.from, \"subject\": $json.subject, \"body\": $json.snippet || $json.text || \"\" } }}"
+      },
+      "id": "post-process-email",
+      "name": "POST /api/internal/process-email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [560, 300]
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [[{ "node": "POST /api/internal/process-email", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {},
+  "notes": "Set CAREERFLOW_APP_URL + INTERNAL_API_SECRET as n8n env vars. Replace REPLACE_WITH_YOUR_USER_ID with your CareerFlow user id (from the Users table). Connect a Gmail OAuth2 credential on the trigger node."
+}

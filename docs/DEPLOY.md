@@ -24,6 +24,7 @@ Create `.env` next to `docker-compose.prod.yml`:
 cat > .env <<EOF
 AUTH_SECRET=$(openssl rand -base64 32)
 POSTGRES_PASSWORD=$(openssl rand -base64 24)
+INTERNAL_API_SECRET=$(openssl rand -base64 24)
 EOF
 cat .env   # keep these safe
 ```
@@ -118,8 +119,12 @@ Also back up the `cf_uploads` volume if you rely on stored CV files.
 
 - **AI provider keys are stored unencrypted** in the DB (per-user). Fine for your own
   instance; add encryption-at-rest before onboarding strangers at scale.
-- **n8n email automation, notifications, and billing are not included** — they're the
-  next phase, intentionally deferred until there's real usage.
+- **Automation (n8n) is optional and self-hosted (free).** To enable it, run the separate
+  `docker compose -f docker-compose.n8n.yml up -d`, set `CAREERFLOW_APP_URL` to your app URL and
+  `INTERNAL_API_SECRET` to match the app, and import the workflows in `n8n/` (see `n8n/README.md`).
+  Start with the reminders schedule (no Gmail needed); add the Gmail monitor once you connect a
+  Google OAuth app. **Billing is not included yet** — the next phase.
+- Set `INTERNAL_API_SECRET` in the app's environment (used by the cron/automation endpoints).
 - This is a single-node setup. It scales vertically (bigger VPS) comfortably for
   early usage; horizontal scaling would mean externalizing uploads (e.g. S3) and
   running multiple app containers behind the proxy.

@@ -1,0 +1,30 @@
+# Optional automation layer. Start only when you want it:
+#   docker compose -f docker-compose.n8n.yml up -d
+# Open http://localhost:5678 (basic auth below). Self-hosted n8n is free.
+name: careerflow_n8n
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-changeme}
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=Europe/Berlin
+      # The app the workflows call. On the same machine as `npm run dev`, use
+      # host.docker.internal; in production point this at your app's URL.
+      - CAREERFLOW_APP_URL=${CAREERFLOW_APP_URL:-http://host.docker.internal:3000}
+      - INTERNAL_API_SECRET=${INTERNAL_API_SECRET:-dev-internal-secret}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - cf_n8n:/home/node/.n8n
+
+volumes:
+  cf_n8n:
