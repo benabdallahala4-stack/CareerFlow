@@ -33,7 +33,10 @@ export default async function BoardPage() {
         <AddJobButton />
       </div>
 
-      <KanbanBoard initialJobs={boardJobs} />
+      <KanbanBoard
+        key={boardJobs.map((j) => j.id).sort().join(",")}
+        initialJobs={boardJobs}
+      />
     </main>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import JobCard, { JobCardData } from "./JobCard";
 import { STATUS_META, type JobStatus } from "@/lib/constants";
 
@@ -29,15 +30,17 @@ export default function KanbanColumn({
         </span>
       </div>
 
-      <div className="flex flex-col gap-2">
-        {jobs.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-zinc-200 px-3 py-6 text-center text-xs text-zinc-400">
-            Drop jobs here
-          </p>
-        ) : (
-          jobs.map((job) => <JobCard key={job.id} job={job} />)
-        )}
-      </div>
+      <SortableContext items={jobs.map((j) => j.id)} strategy={verticalListSortingStrategy}>
+        <div className="flex min-h-[60px] flex-col gap-2">
+          {jobs.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-zinc-200 px-3 py-6 text-center text-xs text-zinc-400">
+              Drop jobs here
+            </p>
+          ) : (
+            jobs.map((job) => <JobCard key={job.id} job={job} />)
+          )}
+        </div>
+      </SortableContext>
     </div>
   );
 }

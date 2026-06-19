@@ -99,6 +99,20 @@ export function deleteJob(userId: string, id: string) {
   return db.job.deleteMany({ where: { id, userId } });
 }
 
+export async function reorderJobs(
+  userId: string,
+  items: { id: string; status: string; boardOrder: number }[]
+) {
+  await db.$transaction(
+    items.map((it) =>
+      db.job.updateMany({
+        where: { id: it.id, userId },
+        data: { status: it.status, boardOrder: it.boardOrder },
+      })
+    )
+  );
+}
+
 export function listRecentJobs(userId: string, limit: number) {
   return db.job.findMany({
     where: { userId },
