@@ -9,6 +9,8 @@ import InterviewSection from "@/components/InterviewSection";
 import NoteSection from "@/components/NoteSection";
 import MatchScorePanel from "@/components/MatchScorePanel";
 import TailorPanel from "@/components/TailorPanel";
+import StageStepper from "@/components/StageStepper";
+import CompanyResearchPanel from "@/components/CompanyResearchPanel";
 import { requireUserId } from "@/lib/auth-helpers";
 
 export const dynamic = "force-dynamic";
@@ -106,6 +108,18 @@ export default async function JobDetail({
         </dl>
       </div>
 
+      <div className="mt-6">
+        <StageStepper jobId={job.id} currentStage={job.currentStage} />
+      </div>
+
+      <div className="mt-6">
+        <CompanyResearchPanel
+          jobId={job.id}
+          hasCompany={Boolean(job.companyId)}
+          initialBrief={job.company?.aiBrief ?? null}
+        />
+      </div>
+
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
         <MatchScorePanel jobId={job.id} />
         <TailorPanel jobId={job.id} />
@@ -117,6 +131,7 @@ export default async function JobDetail({
           interviews={job.interviews.map((iv) => ({
             id: iv.id,
             type: iv.type,
+            stage: iv.stage,
             scheduledAt: iv.scheduledAt ? iv.scheduledAt.toISOString() : null,
             outcome: iv.outcome,
             prepNotes: iv.prepNotes,

@@ -5,12 +5,16 @@ import { useRouter } from "next/navigation";
 import {
   INTERVIEW_TYPES,
   INTERVIEW_OUTCOMES,
+  INTERVIEW_STAGES,
+  STAGE_META,
   type InterviewType,
+  type InterviewStage,
 } from "@/lib/constants";
 
 export interface InterviewRow {
   id: string;
   type: string;
+  stage: string | null;
   scheduledAt: string | null;
   outcome: string;
   prepNotes: string | null;
@@ -68,34 +72,37 @@ export default function InterviewSection({
         {interviews.length === 0 && (
           <p className="text-sm text-zinc-400">No interviews logged yet.</p>
         )}
-        {interviews.map((iv) => (
-          <div
-            key={iv.id}
-            className="flex items-center gap-3 rounded-lg border border-zinc-100 px-3 py-2 text-sm"
-          >
-            <span className="font-medium text-zinc-700">{iv.type}</span>
-            <span className="text-zinc-500">
-              {iv.scheduledAt
-                ? new Date(iv.scheduledAt).toLocaleString()
-                : "unscheduled"}
-            </span>
-            <select
-              value={iv.outcome}
-              onChange={(e) => setOutcome(iv.id, e.target.value)}
-              className="ml-auto rounded border border-zinc-200 px-2 py-1 text-xs"
-            >
-              {INTERVIEW_OUTCOMES.map((o) => (
-                <option key={o} value={o}>
-                  {o}
-                </option>
+        {INTERVIEW_STAGES.filter((st) =>
+          interviews.some((iv) => (iv.stage ?? "SCREENING") === st)
+        ).map((st) => (
+          <div key={st} className="rounded-lg border border-zinc-100 p-2">
+            <div className="mb-1.5 flex items-center gap-1.5 px-1 text-xs font-semibold text-zinc-500">
+              <span className={`h-1.5 w-1.5 rounded-full ${STAGE_META[st as InterviewStage].dot}`} />
+              {STAGE_META[st as InterviewStage].label}
+            </div>
+            {interviews
+              .filter((iv) => (iv.stage ?? "SCREENING") === st)
+              .map((iv) => (
+                <div key={iv.id} className="flex flex-wrap items-center gap-3 px-1 py-1.5 text-sm">
+                  <span className="font-medium text-zinc-700">{iv.type}</span>
+                  <span className="text-zinc-500">
+                    {iv.scheduledAt ? new Date(iv.scheduledAt).toLocaleString() : "unscheduled"}
+                  </span>
+                  {iv.prepNotes && <span className="text-xs text-zinc-400">— {iv.prepNotes}</span>}
+                  <select
+                    value={iv.outcome}
+                    onChange={(e) => setOutcome(iv.id, e.target.value)}
+                    className="ml-auto rounded border border-zinc-200 px-2 py-1 text-xs"
+                  >
+                    {INTERVIEW_OUTCOMES.map((o) => (
+                      <option key={o} value={o}>{o}</option>
+                    ))}
+                  </select>
+                  <button onClick={() => remove(iv.id)} className="text-xs text-zinc-400 hover:text-rose-500">
+                    delete
+                  </button>
+                </div>
               ))}
-            </select>
-            <button
-              onClick={() => remove(iv.id)}
-              className="text-xs text-zinc-400 hover:text-rose-500"
-            >
-              delete
-            </button>
           </div>
         ))}
       </div>
