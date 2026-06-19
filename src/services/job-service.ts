@@ -11,6 +11,7 @@ export interface JobInput {
   source?: string | null;
   status?: JobStatus;
   cvId?: string | null;
+  currentStage?: string | null;
 }
 
 export function listJobs(userId: string) {

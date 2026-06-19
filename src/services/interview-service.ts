@@ -1,8 +1,9 @@
 import { db } from "@/lib/db";
-import { type InterviewType, type InterviewOutcome } from "@/lib/constants";
+import { stageForType, type InterviewType, type InterviewOutcome } from "@/lib/constants";
 
 export interface InterviewInput {
   type: InterviewType;
+  stage?: string | null;
   scheduledAt?: string | Date | null;
   durationMin?: number | null;
   location?: string | null;
@@ -22,6 +23,7 @@ export function createInterview(userId: string, jobId: string, input: InterviewI
   return db.interview.create({
     data: {
       ...input,
+      stage: input.stage ?? stageForType(input.type),
       scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
       jobId,
       userId,
@@ -49,4 +51,24 @@ export async function updateInterview(
 
 export function deleteInterview(userId: string, id: string) {
   return db.interview.deleteMany({ where: { id, userId } });
+}
+
+export function listInterviewsInRange(userId: string, startISO: string, endISO: string) {
+  return db.interview.findMany({
+    where: {
+      userId,
+      scheduledAt: { gte: new Date(startISO), lte: new Date(endISO) },
+    },
+    orderBy: { scheduledAt: "asc" },
+    include: { job: { select: { id: true, title: true } } },
+  });
+}
+
+export function listUpcomingInterviews(userId: string, limit: number) {
+  return db.interview.findMany({
+    where: { userId, scheduledAt: { gte: new Date() } },
+    orderBy: { scheduledAt: "asc" },
+    take: limit,
+    include: { job: { select: { id: true, title: true } } },
+  });
 }
