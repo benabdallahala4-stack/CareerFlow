@@ -19,10 +19,10 @@ export async function PATCH(
 ) {
   const userId = await requireUserId();
   const body = await req.json();
-  const { companyName, ...rest } = body;
+  const { companyName, companyWebsite, ...rest } = body;
   if (companyName !== undefined) {
     rest.companyId = companyName?.trim()
-      ? (await findOrCreateCompany(userId, companyName)).id
+      ? (await findOrCreateCompany(userId, companyName, companyWebsite)).id
       : null;
   }
   return NextResponse.json(await updateJob(userId, params.id, rest));

@@ -165,6 +165,7 @@ export default async function JobDetail({
             id: job.id,
             title: job.title,
             companyName: job.company?.name ?? "",
+            companyWebsite: job.company?.website ?? "",
             url: job.url ?? "",
             salaryAmount: job.salaryAmount,
             salaryCurrency: job.salaryCurrency,

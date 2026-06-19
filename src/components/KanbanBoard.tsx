@@ -21,6 +21,7 @@ interface BoardJob extends JobCardData {
 export default function KanbanBoard({ initialJobs }: { initialJobs: BoardJob[] }) {
   const [jobs, setJobs] = useState<BoardJob[]>(initialJobs);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -52,6 +53,16 @@ export default function KanbanBoard({ initialJobs }: { initialJobs: BoardJob[] }
 
   const activeJob = activeId ? jobs.find((j) => j.id === activeId) ?? null : null;
 
+  const q = query.trim().toLowerCase();
+  const visible = q
+    ? jobs.filter(
+        (j) =>
+          j.title.toLowerCase().includes(q) ||
+          (j.company?.name ?? "").toLowerCase().includes(q) ||
+          (j.location ?? "").toLowerCase().includes(q)
+      )
+    : jobs;
+
   return (
     <DndContext
       sensors={sensors}
@@ -59,12 +70,20 @@ export default function KanbanBoard({ initialJobs }: { initialJobs: BoardJob[] }
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
+      <div className="mb-3">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search jobs by title, company, or location…"
+          className="w-full max-w-sm rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+        />
+      </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {BOARD_COLUMNS.map((status) => (
           <KanbanColumn
             key={status}
             status={status}
-            jobs={jobs.filter((j) => j.status === status)}
+            jobs={visible.filter((j) => j.status === status)}
           />
         ))}
       </div>

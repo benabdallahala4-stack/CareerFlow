@@ -21,9 +21,9 @@ export async function POST(req: NextRequest) {
       { status: 402 }
     );
   }
-  const { companyName, ...rest } = body;
+  const { companyName, companyWebsite, ...rest } = body;
   if (companyName) {
-    const c = await findOrCreateCompany(userId, companyName);
+    const c = await findOrCreateCompany(userId, companyName, companyWebsite);
     rest.companyId = c.id;
   }
   const job = await createJob(userId, rest);

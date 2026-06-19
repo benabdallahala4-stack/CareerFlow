@@ -9,6 +9,7 @@ interface JobFormProps {
     id?: string;
     title?: string;
     companyName?: string | null;
+    companyWebsite?: string | null;
     url?: string;
     salaryAmount?: number | null;
     salaryCurrency?: string | null;
@@ -26,6 +27,7 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initial?.title ?? "");
   const [companyName, setCompanyName] = useState(initial?.companyName ?? "");
+  const [companyWebsite, setCompanyWebsite] = useState(initial?.companyWebsite ?? "");
   const [url, setUrl] = useState(initial?.url ?? "");
   const [salaryAmount, setSalaryAmount] = useState(
     initial?.salaryAmount != null ? String(initial.salaryAmount) : ""
@@ -45,6 +47,7 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
     const payload = {
       title,
       companyName: companyName.trim() || null,
+      companyWebsite: companyWebsite.trim() || null,
       url,
       location,
       description,
@@ -82,12 +85,20 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
         onChange={(e) => setTitle(e.target.value)}
         required
       />
-      <input
-        className={inputClass}
-        placeholder="Company"
-        value={companyName}
-        onChange={(e) => setCompanyName(e.target.value)}
-      />
+      <div className="flex gap-2">
+        <input
+          className={inputClass}
+          placeholder="Company"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+        />
+        <input
+          className={inputClass}
+          placeholder="Company website"
+          value={companyWebsite}
+          onChange={(e) => setCompanyWebsite(e.target.value)}
+        />
+      </div>
       <input
         className={inputClass}
         placeholder="Job posting URL"
