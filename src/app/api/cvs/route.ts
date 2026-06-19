@@ -11,50 +11,56 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const userId = await requireUserId();
-  if (!(await withinLimit(userId, "cvs"))) {
+  try {
+    const userId = await requireUserId();
+    if (!(await withinLimit(userId, "cvs"))) {
+      return NextResponse.json(
+        { error: "You've reached the free plan's CV limit. Upgrade to Pro for unlimited.", upgrade: true },
+        { status: 402 }
+      );
+    }
+    const contentType = req.headers.get("content-type") ?? "";
+
+    // JSON path: { label, content }
+    if (contentType.includes("application/json")) {
+      const body = await req.json();
+      if (!body?.label) {
+        return NextResponse.json({ error: "label is required" }, { status: 400 });
+      }
+      const cv = await createCv(userId, { label: body.label, content: body.content ?? null });
+      return NextResponse.json(cv, { status: 201 });
+    }
+
+    // Multipart path: file upload
+    const form = await req.formData();
+    const file = form.get("file") as File | null;
+    const label =
+      String(form.get("label") ?? "").trim() ||
+      (file ? file.name.replace(/\.[^.]+$/, "") : "Untitled CV");
+
+    let filePath: string | null = null;
+    let content: string | null = null;
+
+    if (file && file.size > 0) {
+      const bytes = Buffer.from(await file.arrayBuffer());
+      const uploadsDir = path.join(process.cwd(), "uploads");
+      await mkdir(uploadsDir, { recursive: true });
+      const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+      await writeFile(path.join(uploadsDir, safeName), bytes);
+      filePath = `uploads/${safeName}`;
+
+      if (file.type.startsWith("text/") || /\.(txt|md)$/i.test(file.name)) {
+        content = bytes.toString("utf-8");
+      }
+    }
+
+    const cv = await createCv(userId, { label, filePath, content });
+    return NextResponse.json(cv, { status: 201 });
+  } catch (err) {
+    console.error("[cv-upload] FAILED:", err);
     return NextResponse.json(
-      { error: "You've reached the free plan's CV limit. Upgrade to Pro for unlimited.", upgrade: true },
-      { status: 402 }
+      { error: err instanceof Error ? err.message : "upload failed" },
+      { status: 500 }
     );
   }
-  const contentType = req.headers.get("content-type") ?? "";
-
-  // JSON path: { label, content }
-  if (contentType.includes("application/json")) {
-    const body = await req.json();
-    if (!body?.label) {
-      return NextResponse.json({ error: "label is required" }, { status: 400 });
-    }
-    const cv = await createCv(userId, { label: body.label, content: body.content ?? null });
-    return NextResponse.json(cv, { status: 201 });
-  }
-
-  // Multipart path: file upload
-  const form = await req.formData();
-  const label = String(form.get("label") ?? "").trim();
-  const file = form.get("file") as File | null;
-  if (!label) {
-    return NextResponse.json({ error: "label is required" }, { status: 400 });
-  }
-
-  let filePath: string | null = null;
-  let content: string | null = null;
-
-  if (file && file.size > 0) {
-    const bytes = Buffer.from(await file.arrayBuffer());
-    const uploadsDir = path.join(process.cwd(), "uploads");
-    await mkdir(uploadsDir, { recursive: true });
-    const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-    await writeFile(path.join(uploadsDir, safeName), bytes);
-    filePath = `uploads/${safeName}`;
-
-    // Auto-extract text only for plain-text files; PDFs/DOCX are pasted later.
-    if (file.type.startsWith("text/") || /\.(txt|md)$/i.test(file.name)) {
-      content = bytes.toString("utf-8");
-    }
-  }
-
-  const cv = await createCv(userId, { label, filePath, content });
-  return NextResponse.json(cv, { status: 201 });
 }
