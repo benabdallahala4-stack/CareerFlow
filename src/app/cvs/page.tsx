@@ -18,6 +18,7 @@ export default async function CvsPage() {
           label: c.label,
           isDefault: c.isDefault,
           hasFile: Boolean(c.filePath),
+          isPdf: Boolean(c.filePath && c.filePath.toLowerCase().endsWith(".pdf")),
           hasContent: Boolean(c.content),
           createdAt: c.createdAt.toISOString(),
         }))}

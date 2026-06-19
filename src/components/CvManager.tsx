@@ -8,6 +8,7 @@ export interface CvRow {
   label: string;
   isDefault: boolean;
   hasFile: boolean;
+  isPdf: boolean;
   hasContent: boolean;
   createdAt: string;
 }
@@ -84,6 +85,22 @@ export default function CvManager({ cvs }: { cvs: CvRow[] }) {
         {cvs.map((cv) => (
           <div key={cv.id} className="rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm">
             <div className="flex items-center gap-3">
+              {cv.isPdf ? (
+                <div className="relative h-[88px] w-[64px] shrink-0 overflow-hidden rounded-md border border-zinc-200 bg-zinc-50">
+                  <iframe
+                    src={`/api/cvs/${cv.id}/file#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                    title=""
+                    aria-hidden="true"
+                    tabIndex={-1}
+                    className="pointer-events-none absolute left-0 top-0 origin-top-left"
+                    style={{ width: "256px", height: "352px", transform: "scale(0.25)" }}
+                  />
+                </div>
+              ) : cv.hasFile ? (
+                <div className="flex h-[88px] w-[64px] shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-zinc-50 text-2xl text-zinc-400">
+                  ⎙
+                </div>
+              ) : null}
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-zinc-800">{cv.label}</span>
