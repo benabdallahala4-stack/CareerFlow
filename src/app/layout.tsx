@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { auth } from "@/auth";
 import { doSignOut } from "./auth-actions";
+import NotificationBell from "@/components/NotificationBell";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -54,7 +55,10 @@ export default async function RootLayout({
                   <a href="/assistant" className="hover:text-indigo-600">Assistant</a>
                   <a href="/settings" className="hover:text-indigo-600">Settings</a>
                 </nav>
-                <form action={doSignOut} className="ml-4 flex items-center gap-3">
+                <div className="ml-4">
+                  <NotificationBell />
+                </div>
+                <form action={doSignOut} className="ml-2 flex items-center gap-3">
                   <span className="text-xs text-zinc-400">{session.user.email}</span>
                   <button
                     type="submit"
