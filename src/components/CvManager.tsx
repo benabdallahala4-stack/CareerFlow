@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { fmtDate } from "@/lib/format";
 
 export interface CvRow {
   id: string;
@@ -20,7 +21,9 @@ export default function CvManager({ cvs }: { cvs: CvRow[] }) {
   const [content, setContent] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [previewId, setPreviewId] = useState<string | null>(null);
+  const [previewId, setPreviewId] = useState<string | null>(
+    () => cvs.find((c) => c.hasFile)?.id ?? null
+  );
 
   // A file OR pasted text (with a label) is enough to submit.
   const canSubmit = Boolean(file) || (label.trim() && content.trim());
@@ -113,7 +116,7 @@ export default function CvManager({ cvs }: { cvs: CvRow[] }) {
                 <div className="mt-0.5 text-xs text-zinc-400">
                   {cv.hasFile ? "file uploaded" : cv.hasContent ? "text only" : "empty"}
                   {" · "}
-                  {new Date(cv.createdAt).toLocaleDateString()}
+                  {fmtDate(cv.createdAt)}
                 </div>
               </div>
               <div className="ml-auto flex items-center gap-3 text-xs">

@@ -10,6 +10,7 @@ import {
   type InterviewType,
   type InterviewStage,
 } from "@/lib/constants";
+import { fmtDateTime } from "@/lib/format";
 
 export interface InterviewRow {
   id: string;
@@ -86,7 +87,7 @@ export default function InterviewSection({
                 <div key={iv.id} className="flex flex-wrap items-center gap-3 px-1 py-1.5 text-sm">
                   <span className="font-medium text-zinc-700">{iv.type}</span>
                   <span className="text-zinc-500">
-                    {iv.scheduledAt ? new Date(iv.scheduledAt).toLocaleString() : "unscheduled"}
+                    {iv.scheduledAt ? fmtDateTime(iv.scheduledAt) : "unscheduled"}
                   </span>
                   {iv.prepNotes && <span className="text-xs text-zinc-400">— {iv.prepNotes}</span>}
                   <select

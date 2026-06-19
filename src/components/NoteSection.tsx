@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { fmtDateTime } from "@/lib/format";
 
 export interface NoteRow {
   id: string;
@@ -62,7 +63,7 @@ export default function NoteSection({
               </button>
             </div>
             <p className="mt-1 text-xs text-zinc-400">
-              {new Date(n.createdAt).toLocaleString()}
+              {fmtDateTime(n.createdAt)}
             </p>
           </div>
         ))}

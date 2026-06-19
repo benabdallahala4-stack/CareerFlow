@@ -13,6 +13,7 @@ import StageStepper from "@/components/StageStepper";
 import CompanyResearchPanel from "@/components/CompanyResearchPanel";
 import { requireUserId } from "@/lib/auth-helpers";
 import { formatSalary } from "@/lib/constants";
+import { fmtDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -65,7 +66,7 @@ export default async function JobDetail({
             </dt>
             <dd className="mt-1 text-zinc-700">
               {job.appliedAt
-                ? new Date(job.appliedAt).toLocaleDateString()
+                ? fmtDate(job.appliedAt)
                 : "—"}
             </dd>
           </div>

@@ -4,6 +4,7 @@ import {
   listInterviewsInRange,
   listUpcomingInterviews,
 } from "@/services/interview-service";
+import { fmtDateTime } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -104,7 +105,7 @@ export default async function CalendarPage({
                 <Link href={`/jobs/${iv.job.id}`} className="block rounded-lg border border-zinc-100 px-3 py-2 text-sm hover:bg-zinc-50">
                   <div className="font-medium text-zinc-700">{iv.job.title}</div>
                   <div className="text-xs text-zinc-400">
-                    {iv.type} · {iv.scheduledAt ? new Date(iv.scheduledAt).toLocaleString() : ""}
+                    {iv.type} · {iv.scheduledAt ? fmtDateTime(iv.scheduledAt) : ""}
                   </div>
                 </Link>
               </li>

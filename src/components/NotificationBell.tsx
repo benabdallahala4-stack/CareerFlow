@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { fmtDateTime } from "@/lib/format";
 
 interface Notif {
   id: string;
@@ -108,7 +109,7 @@ export default function NotificationBell() {
                       <div className="text-sm text-zinc-800">{n.title}</div>
                       {n.body && <div className="truncate text-xs text-zinc-500">{n.body}</div>}
                       <div className="mt-0.5 text-[11px] text-zinc-400">
-                        {new Date(n.createdAt).toLocaleString()}
+                        {fmtDateTime(n.createdAt)}
                       </div>
                     </div>
                   </div>

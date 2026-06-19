@@ -7,6 +7,7 @@ import { listUpcomingInterviews } from "@/services/interview-service";
 import { listRecentJobs } from "@/services/job-service";
 import { listPendingSuggestions } from "@/services/suggestion-service";
 import { getEntitlements } from "@/services/plan-service";
+import { fmtDate, fmtDateTime } from "@/lib/format";
 import StatCard from "@/components/StatCard";
 import PipelineBar from "@/components/PipelineBar";
 import HomeNudges from "@/components/HomeNudges";
@@ -75,7 +76,7 @@ export default async function HomePage() {
                       <span className="font-medium text-zinc-700">{iv.job.title}</span>
                       <span className="text-zinc-500">{iv.type}</span>
                       <span className="ml-auto text-xs text-zinc-400">
-                        {iv.scheduledAt ? new Date(iv.scheduledAt).toLocaleString() : ""}
+                        {iv.scheduledAt ? fmtDateTime(iv.scheduledAt) : ""}
                       </span>
                     </Link>
                   </li>
@@ -130,7 +131,7 @@ export default async function HomePage() {
                     <span className="text-zinc-700">{j.title}</span>
                     <span className="text-xs text-zinc-400">{j.company?.name ?? ""}</span>
                     <span className="ml-auto text-xs text-zinc-300">
-                      {new Date(j.updatedAt).toLocaleDateString()}
+                      {fmtDate(j.updatedAt)}
                     </span>
                   </Link>
                 </li>
