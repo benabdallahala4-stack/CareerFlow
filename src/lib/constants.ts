@@ -32,3 +32,22 @@ export const STATUS_META: Record<
   REJECTED: { label: "Rejected", dot: "bg-rose-400", badge: "bg-rose-50 text-rose-500" },
   ARCHIVED: { label: "Archived", dot: "bg-zinc-300", badge: "bg-zinc-100 text-zinc-400" },
 };
+
+export const INTERVIEW_TYPES = [
+  "PHONE",
+  "TECHNICAL",
+  "ONSITE",
+  "HR",
+  "FINAL",
+] as const;
+
+export type InterviewType = (typeof INTERVIEW_TYPES)[number];
+
+export const INTERVIEW_OUTCOMES = [
+  "PENDING",
+  "PASSED",
+  "FAILED",
+  "CANCELLED",
+] as const;
+
+export type InterviewOutcome = (typeof INTERVIEW_OUTCOMES)[number];
