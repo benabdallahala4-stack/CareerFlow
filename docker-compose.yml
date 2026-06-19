@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: careerflow
+      POSTGRES_PASSWORD: careerflow
+      POSTGRES_DB: careerflow
+    ports:
+      - "5433:5432"
+    volumes:
+      - cf_pgdata:/var/lib/postgresql/data
+
+volumes:
+  cf_pgdata:
