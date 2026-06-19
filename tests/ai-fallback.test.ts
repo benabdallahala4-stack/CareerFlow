@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ruleBasedMatch, genericPrepQuestions } from "@/services/ai/fallback";
+import { ruleBasedMatch, genericPrepQuestions, companyBriefFallback } from "@/services/ai/fallback";
 
 describe("ruleBasedMatch", () => {
   it("scores keyword overlap and lists missing terms", () => {
@@ -22,5 +22,14 @@ describe("genericPrepQuestions", () => {
     const qs = genericPrepQuestions("TECHNICAL");
     expect(qs.length).toBeGreaterThan(2);
     expect(typeof qs[0]).toBe("string");
+  });
+});
+
+describe("companyBriefFallback", () => {
+  it("returns a checklist covering the four research areas", () => {
+    const t = companyBriefFallback("Acme");
+    expect(t).toContain("Acme");
+    expect(t.toLowerCase()).toContain("overview");
+    expect(t.toLowerCase()).toContain("questions to ask");
   });
 });

@@ -74,3 +74,16 @@ const PREP_BANK: Record<string, string[]> = {
 export function genericPrepQuestions(type: string): string[] {
   return PREP_BANK[type] ?? PREP_BANK.PHONE;
 }
+
+export function companyBriefFallback(companyName: string): string {
+  const c = companyName || "this company";
+  return [
+    `No AI key configured — here is a research checklist for ${c}:`,
+    "",
+    "Overview: visit their website + LinkedIn. What do they sell, who are their customers, how big are they?",
+    "Recent news: search Google News + their blog for the last 3 months.",
+    "Likely interview questions: review the job description and Glassdoor interview reviews for this company.",
+    "Smart questions to ask them: team structure, success in 6 months, biggest current challenge, growth plans.",
+    "Talking points: connect your experience to their product and a recent company milestone.",
+  ].join("\n");
+}
