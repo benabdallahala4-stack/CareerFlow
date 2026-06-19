@@ -41,6 +41,7 @@ export default function RootLayout({
             </span>
             <nav className="ml-auto flex items-center gap-4 text-sm text-zinc-600">
               <a href="/" className="hover:text-indigo-600">Board</a>
+              <a href="/dashboard" className="hover:text-indigo-600">Dashboard</a>
               <a href="/cvs" className="hover:text-indigo-600">CVs</a>
             </nav>
           </div>
