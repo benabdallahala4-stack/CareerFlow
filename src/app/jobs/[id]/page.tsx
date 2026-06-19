@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getJob } from "@/services/job-service";
+import { listCvs } from "@/services/cv-service";
 import JobForm from "@/components/JobForm";
 import StatusBadge from "@/components/StatusBadge";
+import CvPicker from "@/components/CvPicker";
+import InterviewSection from "@/components/InterviewSection";
+import NoteSection from "@/components/NoteSection";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +17,8 @@ export default async function JobDetail({
 }) {
   const job = await getJob(params.id);
   if (!job) notFound();
+
+  const cvs = await listCvs();
 
   return (
     <main className="mx-auto max-w-3xl p-6">
@@ -54,6 +60,18 @@ export default async function JobDetail({
                 : "—"}
             </dd>
           </div>
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+              Tagged CV
+            </dt>
+            <dd className="mt-1">
+              <CvPicker
+                jobId={job.id}
+                cvId={job.cvId}
+                options={cvs.map((c) => ({ id: c.id, label: c.label }))}
+              />
+            </dd>
+          </div>
           <div className="col-span-2">
             <dt className="text-xs font-medium uppercase tracking-wide text-zinc-400">
               Posting
@@ -82,6 +100,30 @@ export default async function JobDetail({
             </dd>
           </div>
         </dl>
+      </div>
+
+      <div className="mt-6">
+        <InterviewSection
+          jobId={job.id}
+          interviews={job.interviews.map((iv) => ({
+            id: iv.id,
+            type: iv.type,
+            scheduledAt: iv.scheduledAt ? iv.scheduledAt.toISOString() : null,
+            outcome: iv.outcome,
+            prepNotes: iv.prepNotes,
+          }))}
+        />
+      </div>
+
+      <div className="mt-6">
+        <NoteSection
+          jobId={job.id}
+          notes={job.notes.map((n) => ({
+            id: n.id,
+            body: n.body,
+            createdAt: n.createdAt.toISOString(),
+          }))}
+        />
       </div>
 
       <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">

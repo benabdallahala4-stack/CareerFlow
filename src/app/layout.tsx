@@ -39,6 +39,10 @@ export default function RootLayout({
             <span className="ml-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500">
               beta
             </span>
+            <nav className="ml-auto flex items-center gap-4 text-sm text-zinc-600">
+              <a href="/" className="hover:text-indigo-600">Board</a>
+              <a href="/cvs" className="hover:text-indigo-600">CVs</a>
+            </nav>
           </div>
         </header>
         {children}
