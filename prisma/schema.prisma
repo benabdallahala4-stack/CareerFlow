@@ -26,10 +26,12 @@ model User {
 model Company {
   id       String  @id @default(cuid())
   userId   String
-  name     String
-  website  String?
-  location String?
-  notes    String?
+  name      String
+  website   String?
+  location  String?
+  notes     String?
+  aiBrief   String?
+  aiBriefAt DateTime?
 
   user User  @relation(fields: [userId], references: [id])
   jobs Job[]
@@ -48,8 +50,9 @@ model Job {
   salary      String?
   location    String?
   source      String?
-  status      String   @default("WISHLIST") // WISHLIST|APPLIED|INTERVIEW|OFFER|REJECTED|ARCHIVED
-  boardOrder  Int      @default(0)
+  status       String   @default("WISHLIST") // WISHLIST|APPLIED|INTERVIEW|OFFER|REJECTED|ARCHIVED
+  currentStage String?  // APPLIED|SCREENING|TECHNICAL|ONSITE|FINAL|OFFER
+  boardOrder   Int      @default(0)
   cvId        String?
   matchScore  Int?
   appliedAt   DateTime?
@@ -68,6 +71,7 @@ model Interview {
   userId      String
   jobId       String
   type        String    // PHONE|TECHNICAL|ONSITE|HR|FINAL
+  stage       String?   // APPLIED|SCREENING|TECHNICAL|ONSITE|FINAL|OFFER
   scheduledAt DateTime?
   durationMin Int?
   location    String?

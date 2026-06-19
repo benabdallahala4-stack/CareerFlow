@@ -51,3 +51,39 @@ export const INTERVIEW_OUTCOMES = [
 ] as const;
 
 export type InterviewOutcome = (typeof INTERVIEW_OUTCOMES)[number];
+
+export const INTERVIEW_STAGES = [
+  "APPLIED",
+  "SCREENING",
+  "TECHNICAL",
+  "ONSITE",
+  "FINAL",
+  "OFFER",
+] as const;
+
+export type InterviewStage = (typeof INTERVIEW_STAGES)[number];
+
+export const STAGE_META: Record<InterviewStage, { label: string; dot: string }> = {
+  APPLIED: { label: "Applied", dot: "bg-zinc-400" },
+  SCREENING: { label: "Screening", dot: "bg-blue-500" },
+  TECHNICAL: { label: "Technical", dot: "bg-violet-500" },
+  ONSITE: { label: "Onsite", dot: "bg-amber-500" },
+  FINAL: { label: "Final", dot: "bg-orange-500" },
+  OFFER: { label: "Offer", dot: "bg-emerald-500" },
+};
+
+// Map an interview type to its default stage.
+export function stageForType(type: string): InterviewStage {
+  switch (type) {
+    case "TECHNICAL":
+      return "TECHNICAL";
+    case "ONSITE":
+      return "ONSITE";
+    case "FINAL":
+      return "FINAL";
+    case "PHONE":
+    case "HR":
+    default:
+      return "SCREENING";
+  }
+}
