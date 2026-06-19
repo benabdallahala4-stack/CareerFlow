@@ -21,6 +21,24 @@ model User {
   notes      Note[]
   aiSettings AiSetting[]
   aiUsage    AiUsageLog[]
+  notifications Notification[]
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  kind      String   // STAGE_CHANGE|STATUS_CHANGE|REMINDER|NUDGE|RECRUITER_REPLY|GENERIC
+  title     String
+  body      String?
+  jobId     String?
+  read      Boolean  @default(false)
+  dedupeKey String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, read])
 }
 
 model Company {
