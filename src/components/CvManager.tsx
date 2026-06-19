@@ -18,24 +18,42 @@ export default function CvManager({ cvs }: { cvs: CvRow[] }) {
   const [file, setFile] = useState<File | null>(null);
   const [content, setContent] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // A file OR pasted text (with a label) is enough to submit.
+  const canSubmit = Boolean(file) || (label.trim() && content.trim());
 
   async function upload(e: React.FormEvent) {
     e.preventDefault();
-    if (!label.trim()) return;
+    setError(null);
+    if (!canSubmit) {
+      setError("Choose a file, or add a label and paste CV text.");
+      return;
+    }
     setSaving(true);
+    // Derive a label from the filename if none was typed.
+    const effectiveLabel =
+      label.trim() || (file ? file.name.replace(/\.[^.]+$/, "") : "Untitled CV");
+
+    let res: Response;
     if (file) {
       const fd = new FormData();
-      fd.set("label", label);
+      fd.set("label", effectiveLabel);
       fd.set("file", file);
-      await fetch("/api/cvs", { method: "POST", body: fd });
+      res = await fetch("/api/cvs", { method: "POST", body: fd });
     } else {
-      await fetch("/api/cvs", {
+      res = await fetch("/api/cvs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ label, content }),
+        body: JSON.stringify({ label: effectiveLabel, content }),
       });
     }
     setSaving(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Upload failed. Please try again.");
+      return;
+    }
     setLabel("");
     setFile(null);
     setContent("");
@@ -106,17 +124,20 @@ export default function CvManager({ cvs }: { cvs: CvRow[] }) {
         <h2 className="mb-3 text-sm font-semibold text-zinc-800">Add a CV</h2>
         <form onSubmit={upload} className="flex flex-col gap-3">
           <input
-            placeholder="Label (e.g. Backend v2) *"
+            placeholder="Label (optional — defaults to file name)"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
             className="rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
-            required
           />
-          <input
-            type="file"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="text-sm text-zinc-600 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm"
-          />
+          <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-zinc-300 px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50">
+            <span className="rounded-md bg-zinc-100 px-2 py-1 text-xs">Choose file</span>
+            <span className="truncate text-zinc-500">{file ? file.name : "PDF, DOCX, TXT…"}</span>
+            <input
+              type="file"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              className="hidden"
+            />
+          </label>
           <textarea
             placeholder="…or paste CV text here"
             rows={4}
@@ -124,9 +145,10 @@ export default function CvManager({ cvs }: { cvs: CvRow[] }) {
             onChange={(e) => setContent(e.target.value)}
             className="rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
           />
+          {error && <p className="text-sm text-rose-500">{error}</p>}
           <button
             type="submit"
-            disabled={saving || !label.trim()}
+            disabled={saving || !canSubmit}
             className="rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 shadow-sm shadow-violet-600/20 px-4 py-2 text-sm font-medium text-white hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50"
           >
             {saving ? "Saving…" : "Add CV"}
