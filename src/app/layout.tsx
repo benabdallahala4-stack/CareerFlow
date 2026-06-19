@@ -4,6 +4,7 @@ import "./globals.css";
 import { auth } from "@/auth";
 import { doSignOut } from "./auth-actions";
 import NotificationBell from "@/components/NotificationBell";
+import { getPlan } from "@/services/plan-service";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,6 +28,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  const plan = session?.user?.id ? await getPlan(session.user.id) : "FREE";
 
   return (
     <html lang="en">
@@ -55,7 +57,16 @@ export default async function RootLayout({
                   <a href="/assistant" className="hover:text-indigo-600">Assistant</a>
                   <a href="/settings" className="hover:text-indigo-600">Settings</a>
                 </nav>
-                <div className="ml-4">
+                {plan === "PRO" ? (
+                  <a href="/billing" className="ml-4 rounded-full bg-indigo-600 px-2 py-0.5 text-xs font-medium text-white">
+                    PRO
+                  </a>
+                ) : (
+                  <a href="/billing" className="ml-4 text-xs font-medium text-indigo-600 hover:underline">
+                    Upgrade
+                  </a>
+                )}
+                <div className="ml-3">
                   <NotificationBell />
                 </div>
                 <form action={doSignOut} className="ml-2 flex items-center gap-3">
