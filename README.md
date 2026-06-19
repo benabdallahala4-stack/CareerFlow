@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CareerFlow OS
 
-## Getting Started
+An AI-assisted job-search command center — track every application, manage interviews
+like a CRM, store CV versions, and use AI (bring your own key) to sharpen your CV and
+interview prep. Local-first, free to run, and deployable to a single VPS.
 
-First, run the development server:
+## Features
+
+- **Public landing page** at `/` + email/password accounts (multi-user).
+- **Kanban job tracker** — drag applications through Wishlist → Applied → Interview → Offer → Rejected.
+- **Interviews, CVs & notes** — log interviews with outcomes, store multiple CV versions, tag a CV to each job.
+- **Dashboard** — response rate, offers, interviews this week, pipeline overview.
+- **AI layer (optional, BYO key)** — provider-agnostic router (Claude / OpenAI / Groq / Gemini / Ollama)
+  powering CV match score, tailoring, interview prep, and a career chat. Falls back to rule-based
+  logic when no key is set, so **the app is fully useful without any AI**.
+
+## Tech stack
+
+Next.js 14 (App Router) · TypeScript · Tailwind · Prisma · PostgreSQL · NextAuth (credentials) · Vitest.
+
+## Local development
+
+Requires Node 22, Docker, and (on Windows) WSL.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1. Start the local Postgres
+docker compose up -d
+
+# 2. Install deps + set up the database
+npm install
+npx prisma migrate dev
+npm run db:seed        # seeds a demo account
+
+# 3. Run the app
+npm run dev            # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Demo login after seeding: **demo@careerflow.local** / **password** — or create your own at `/signup`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`.env` is required: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_TRUST_HOST`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tests
 
-## Learn More
+```bash
+npm test               # Vitest — service + AI-router unit/integration tests
+```
 
-To learn more about Next.js, take a look at the following resources:
+Tests run against the local Postgres and are executed sequentially (`fileParallelism: false`)
+because they share one database.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+See [`docs/DEPLOY.md`](docs/DEPLOY.md) for a full single-VPS runbook (Docker Compose +
+Postgres + Caddy auto-HTTPS). Production migrations apply automatically on container start.
 
-## Deploy on Vercel
+## Project docs
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Design spec: [`docs/specs/2026-06-18-careerflow-os-design.md`](docs/specs/2026-06-18-careerflow-os-design.md)
+- Implementation plans: [`docs/plans/`](docs/plans/)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Roadmap (deferred until there are real users)
+
+n8n email automation (auto-detect interviews/rejections), smart follow-up reminders,
+notifications, managed-AI billing. Intentionally not built yet — the free core comes first.

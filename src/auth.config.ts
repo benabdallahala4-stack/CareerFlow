@@ -8,6 +8,7 @@ export const authConfig = {
     authorized({ auth, request: { nextUrl } }) {
       const isAuthed = !!auth?.user;
       const isPublic =
+        nextUrl.pathname === "/" ||
         nextUrl.pathname.startsWith("/login") ||
         nextUrl.pathname.startsWith("/signup") ||
         nextUrl.pathname.startsWith("/api/auth");
