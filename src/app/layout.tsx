@@ -51,8 +51,8 @@ export default async function RootLayout({
             {session?.user ? (
               <>
                 <nav className="ml-auto flex items-center gap-4 text-sm text-zinc-600">
+                  <a href="/home" className="hover:text-indigo-600">Home</a>
                   <a href="/board" className="hover:text-indigo-600">Board</a>
-                  <a href="/dashboard" className="hover:text-indigo-600">Dashboard</a>
                   <a href="/calendar" className="hover:text-indigo-600">Calendar</a>
                   <a href="/cvs" className="hover:text-indigo-600">CVs</a>
                   <a href="/assistant" className="hover:text-indigo-600">Assistant</a>
