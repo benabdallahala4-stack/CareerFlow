@@ -16,11 +16,11 @@ async function ensureUser() {
 
 beforeEach(async () => {
   await ensureUser();
-  await db.cv.deleteMany({ where: { label: { startsWith: "TEST_PL_" } } });
+  await db.cv.deleteMany({ where: { userId: U } });
 });
 
 afterEach(async () => {
-  await db.cv.deleteMany({ where: { label: { startsWith: "TEST_PL_" } } });
+  await db.cv.deleteMany({ where: { userId: U } });
   await db.user.update({ where: { id: U }, data: { plan: "FREE", proSince: null } });
 });
 
