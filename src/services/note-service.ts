@@ -13,6 +13,11 @@ export function createNoteForJob(userId: string, jobId: string, body: string) {
   });
 }
 
+export async function updateNote(userId: string, id: string, body: string) {
+  await db.note.updateMany({ where: { id, userId }, data: { body } });
+  return db.note.findFirst({ where: { id, userId } });
+}
+
 export function deleteNote(userId: string, id: string) {
   return db.note.deleteMany({ where: { id, userId } });
 }

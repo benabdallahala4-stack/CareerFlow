@@ -20,6 +20,19 @@ export default function NoteSection({
   const router = useRouter();
   const [body, setBody] = useState("");
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+
+  async function saveEdit(id: string) {
+    if (!editText.trim()) return;
+    await fetch(`/api/notes/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body: editText }),
+    });
+    setEditingId(null);
+    router.refresh();
+  }
 
   async function addNote(e: React.FormEvent) {
     e.preventDefault();
@@ -53,18 +66,48 @@ export default function NoteSection({
             key={n.id}
             className="group rounded-lg border border-zinc-100 px-3 py-2 text-sm"
           >
-            <div className="flex items-start justify-between gap-3">
-              <p className="whitespace-pre-wrap text-zinc-700">{n.body}</p>
-              <button
-                onClick={() => remove(n.id)}
-                className="shrink-0 text-xs text-zinc-400 opacity-0 transition group-hover:opacity-100 hover:text-rose-500"
-              >
-                delete
-              </button>
-            </div>
-            <p className="mt-1 text-xs text-zinc-400">
-              {fmtDateTime(n.createdAt)}
-            </p>
+            {editingId === n.id ? (
+              <div className="flex flex-col gap-2">
+                <textarea
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  rows={2}
+                  className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => saveEdit(n.id)}
+                    className="rounded-md bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-1 text-xs font-medium text-white"
+                  >
+                    Save
+                  </button>
+                  <button onClick={() => setEditingId(null)} className="text-xs text-zinc-500 hover:underline">
+                    cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="whitespace-pre-wrap text-zinc-700">{n.body}</p>
+                  <div className="flex shrink-0 gap-2 opacity-0 transition group-hover:opacity-100">
+                    <button
+                      onClick={() => {
+                        setEditingId(n.id);
+                        setEditText(n.body);
+                      }}
+                      className="text-xs text-zinc-400 hover:text-indigo-600"
+                    >
+                      edit
+                    </button>
+                    <button onClick={() => remove(n.id)} className="text-xs text-zinc-400 hover:text-rose-500">
+                      delete
+                    </button>
+                  </div>
+                </div>
+                <p className="mt-1 text-xs text-zinc-400">{fmtDateTime(n.createdAt)}</p>
+              </>
+            )}
           </div>
         ))}
       </div>

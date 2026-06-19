@@ -36,6 +36,34 @@ export default function InterviewSection({
   const [scheduledAt, setScheduledAt] = useState("");
   const [prepNotes, setPrepNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editType, setEditType] = useState<InterviewType>("PHONE");
+  const [editWhen, setEditWhen] = useState("");
+  const [editPrep, setEditPrep] = useState("");
+
+  function toLocalInput(iso: string | null): string {
+    if (!iso) return "";
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function startEdit(iv: InterviewRow) {
+    setEditingId(iv.id);
+    setEditType(iv.type as InterviewType);
+    setEditWhen(toLocalInput(iv.scheduledAt));
+    setEditPrep(iv.prepNotes ?? "");
+  }
+
+  async function saveEdit(id: string) {
+    await fetch(`/api/interviews/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: editType, scheduledAt: editWhen || null, prepNotes: editPrep }),
+    });
+    setEditingId(null);
+    router.refresh();
+  }
 
   async function addInterview(e: React.FormEvent) {
     e.preventDefault();
@@ -83,27 +111,65 @@ export default function InterviewSection({
             </div>
             {interviews
               .filter((iv) => (iv.stage ?? "SCREENING") === st)
-              .map((iv) => (
-                <div key={iv.id} className="flex flex-wrap items-center gap-3 px-1 py-1.5 text-sm">
-                  <span className="font-medium text-zinc-700">{iv.type}</span>
-                  <span className="text-zinc-500">
-                    {iv.scheduledAt ? fmtDateTime(iv.scheduledAt) : "unscheduled"}
-                  </span>
-                  {iv.prepNotes && <span className="text-xs text-zinc-400">— {iv.prepNotes}</span>}
-                  <select
-                    value={iv.outcome}
-                    onChange={(e) => setOutcome(iv.id, e.target.value)}
-                    className="ml-auto rounded border border-zinc-200 px-2 py-1 text-xs"
-                  >
-                    {INTERVIEW_OUTCOMES.map((o) => (
-                      <option key={o} value={o}>{o}</option>
-                    ))}
-                  </select>
-                  <button onClick={() => remove(iv.id)} className="text-xs text-zinc-400 hover:text-rose-500">
-                    delete
-                  </button>
-                </div>
-              ))}
+              .map((iv) =>
+                editingId === iv.id ? (
+                  <div key={iv.id} className="flex flex-wrap items-center gap-2 px-1 py-1.5">
+                    <select
+                      value={editType}
+                      onChange={(e) => setEditType(e.target.value as InterviewType)}
+                      className={inputClass}
+                    >
+                      {INTERVIEW_TYPES.map((t) => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="datetime-local"
+                      value={editWhen}
+                      onChange={(e) => setEditWhen(e.target.value)}
+                      className={inputClass}
+                    />
+                    <input
+                      placeholder="Prep notes"
+                      value={editPrep}
+                      onChange={(e) => setEditPrep(e.target.value)}
+                      className={`${inputClass} flex-1`}
+                    />
+                    <button
+                      onClick={() => saveEdit(iv.id)}
+                      className="rounded-md bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-1.5 text-xs font-medium text-white"
+                    >
+                      Save
+                    </button>
+                    <button onClick={() => setEditingId(null)} className="text-xs text-zinc-500 hover:underline">
+                      cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div key={iv.id} className="group flex flex-wrap items-center gap-3 px-1 py-1.5 text-sm">
+                    <span className="font-medium text-zinc-700">{iv.type}</span>
+                    <span className="text-zinc-500">
+                      {iv.scheduledAt ? fmtDateTime(iv.scheduledAt) : "unscheduled"}
+                    </span>
+                    {iv.prepNotes && <span className="text-xs text-zinc-400">— {iv.prepNotes}</span>}
+                    <select
+                      value={iv.outcome}
+                      onChange={(e) => setOutcome(iv.id, e.target.value)}
+                      className="ml-auto rounded border border-zinc-200 px-2 py-1 text-xs"
+                    >
+                      {INTERVIEW_OUTCOMES.map((o) => (
+                        <option key={o} value={o}>{o}</option>
+                      ))}
+                    </select>
+                    <button onClick={() => startEdit(iv)} className="text-xs text-zinc-400 hover:text-indigo-600">
+                      edit
+                    </button>
+                    <button onClick={() => remove(iv.id)} className="text-xs text-zinc-400 hover:text-rose-500">
+                      delete
+                    </button>
+                  </div>
+                )
+              )}
           </div>
         ))}
       </div>
