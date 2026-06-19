@@ -3,6 +3,7 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { listCvs, createCv } from "@/services/cv-service";
 import { requireUserId } from "@/lib/auth-helpers";
+import { withinLimit } from "@/services/plan-service";
 
 export async function GET() {
   const userId = await requireUserId();
@@ -11,6 +12,12 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const userId = await requireUserId();
+  if (!(await withinLimit(userId, "cvs"))) {
+    return NextResponse.json(
+      { error: "You've reached the free plan's CV limit. Upgrade to Pro for unlimited.", upgrade: true },
+      { status: 402 }
+    );
+  }
   const contentType = req.headers.get("content-type") ?? "";
 
   // JSON path: { label, content }

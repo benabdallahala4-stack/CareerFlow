@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listJobs, createJob } from "@/services/job-service";
 import { requireUserId } from "@/lib/auth-helpers";
+import { withinLimit } from "@/services/plan-service";
 
 export async function GET() {
   const userId = await requireUserId();
@@ -12,6 +13,12 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   if (!body?.title) {
     return NextResponse.json({ error: "title is required" }, { status: 400 });
+  }
+  if (!(await withinLimit(userId, "jobs"))) {
+    return NextResponse.json(
+      { error: "You've reached the free plan's job limit. Upgrade to Pro for unlimited.", upgrade: true },
+      { status: 402 }
+    );
   }
   const job = await createJob(userId, body);
   return NextResponse.json(job, { status: 201 });
