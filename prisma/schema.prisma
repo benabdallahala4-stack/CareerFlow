@@ -12,6 +12,8 @@ model User {
   email        String   @unique
   name         String?
   passwordHash String?
+  plan         String   @default("FREE") // FREE|PRO
+  proSince     DateTime?
   createdAt    DateTime @default(now())
 
   companies  Company[]
