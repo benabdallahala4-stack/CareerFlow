@@ -5,6 +5,8 @@ export interface CompanyInput {
   website?: string | null;
   location?: string | null;
   notes?: string | null;
+  aiBrief?: string | null;
+  aiBriefAt?: Date | null;
 }
 
 export function listCompanies(userId: string) {
