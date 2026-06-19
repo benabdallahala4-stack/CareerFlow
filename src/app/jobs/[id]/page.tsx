@@ -15,6 +15,7 @@ import { requireUserId } from "@/lib/auth-helpers";
 import { formatSalary } from "@/lib/constants";
 import { fmtDate } from "@/lib/format";
 import DeleteJobButton from "@/components/DeleteJobButton";
+import ArchiveJobButton from "@/components/ArchiveJobButton";
 
 export const dynamic = "force-dynamic";
 
@@ -158,7 +159,10 @@ export default async function JobDetail({
       <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-zinc-800">Edit job</h2>
-          <DeleteJobButton jobId={job.id} />
+          <div className="flex items-center gap-4">
+            <ArchiveJobButton jobId={job.id} />
+            <DeleteJobButton jobId={job.id} />
+          </div>
         </div>
         <JobForm
           initial={{
