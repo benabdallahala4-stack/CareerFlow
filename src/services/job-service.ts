@@ -8,6 +8,9 @@ export interface JobInput {
   description?: string | null;
   url?: string | null;
   salary?: string | null;
+  salaryAmount?: number | null;
+  salaryCurrency?: string | null;
+  salaryPeriod?: string | null;
   location?: string | null;
   source?: string | null;
   status?: JobStatus;

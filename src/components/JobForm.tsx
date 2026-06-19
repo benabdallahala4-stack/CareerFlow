@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { SALARY_CURRENCIES, SALARY_PERIODS, formatSalary } from "@/lib/constants";
 
 interface JobFormProps {
   initial?: {
     id?: string;
     title?: string;
     url?: string;
-    salary?: string;
+    salaryAmount?: number | null;
+    salaryCurrency?: string | null;
+    salaryPeriod?: string | null;
     location?: string;
     description?: string;
   };
@@ -22,7 +25,11 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initial?.title ?? "");
   const [url, setUrl] = useState(initial?.url ?? "");
-  const [salary, setSalary] = useState(initial?.salary ?? "");
+  const [salaryAmount, setSalaryAmount] = useState(
+    initial?.salaryAmount != null ? String(initial.salaryAmount) : ""
+  );
+  const [salaryCurrency, setSalaryCurrency] = useState(initial?.salaryCurrency ?? "EUR");
+  const [salaryPeriod, setSalaryPeriod] = useState(initial?.salaryPeriod ?? "YEAR");
   const [location, setLocation] = useState(initial?.location ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [saving, setSaving] = useState(false);
@@ -32,21 +39,28 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const payload = { title, url, salary, location, description };
-    const res = await fetch(
-      isEdit ? `/api/jobs/${initial!.id}` : "/api/jobs",
-      {
-        method: isEdit ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
+    const amount = salaryAmount ? parseInt(salaryAmount.replace(/[^\d]/g, ""), 10) : null;
+    const payload = {
+      title,
+      url,
+      location,
+      description,
+      salaryAmount: amount,
+      salaryCurrency: amount ? salaryCurrency : null,
+      salaryPeriod: amount ? salaryPeriod : null,
+      salary: formatSalary(amount, salaryCurrency, salaryPeriod) ?? null,
+    };
+    const res = await fetch(isEdit ? `/api/jobs/${initial!.id}` : "/api/jobs", {
+      method: isEdit ? "PATCH" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
     setSaving(false);
     if (res.ok) {
       if (!isEdit) {
         setTitle("");
         setUrl("");
-        setSalary("");
+        setSalaryAmount("");
         setLocation("");
         setDescription("");
       }
@@ -70,20 +84,44 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
         value={url}
         onChange={(e) => setUrl(e.target.value)}
       />
-      <div className="flex gap-2">
-        <input
-          className={inputClass}
-          placeholder="Salary"
-          value={salary}
-          onChange={(e) => setSalary(e.target.value)}
-        />
-        <input
-          className={inputClass}
-          placeholder="Location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
+
+      <div>
+        <label className="mb-1 block text-xs font-medium text-zinc-500">Salary (gross)</label>
+        <div className="flex gap-2">
+          <input
+            className={inputClass}
+            inputMode="numeric"
+            placeholder="Amount"
+            value={salaryAmount}
+            onChange={(e) => setSalaryAmount(e.target.value)}
+          />
+          <select
+            className={`${inputClass} w-auto`}
+            value={salaryCurrency}
+            onChange={(e) => setSalaryCurrency(e.target.value)}
+          >
+            {SALARY_CURRENCIES.map((c) => (
+              <option key={c.value} value={c.value}>{c.label}</option>
+            ))}
+          </select>
+          <select
+            className={`${inputClass} w-auto`}
+            value={salaryPeriod}
+            onChange={(e) => setSalaryPeriod(e.target.value)}
+          >
+            {SALARY_PERIODS.map((p) => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
+
+      <input
+        className={inputClass}
+        placeholder="Location"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+      />
       <textarea
         className={inputClass}
         placeholder="Description / notes"

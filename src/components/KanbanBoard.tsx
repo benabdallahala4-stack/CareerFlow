@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
-import { useRouter } from "next/navigation";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import KanbanColumn from "./KanbanColumn";
 import { JobCardData } from "./JobCard";
 import { BOARD_COLUMNS } from "@/lib/constants";
@@ -12,10 +17,15 @@ interface BoardJob extends JobCardData {
 }
 
 export default function KanbanBoard({ initialJobs }: { initialJobs: BoardJob[] }) {
-  const router = useRouter();
   const [jobs, setJobs] = useState<BoardJob[]>(initialJobs);
 
-  async function handleDragEnd(event: DragEndEvent) {
+  // A small activation distance makes drags start crisply (and lets plain
+  // clicks through to the card link).
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
     const jobId = String(event.active.id);
     const newStatus = event.over ? String(event.over.id) : null;
     if (!newStatus) return;
@@ -23,22 +33,21 @@ export default function KanbanBoard({ initialJobs }: { initialJobs: BoardJob[] }
     const job = jobs.find((j) => j.id === jobId);
     if (!job || job.status === newStatus) return;
 
-    // optimistic update
+    // Optimistic update only — persist in the background, no full re-render.
     setJobs((prev) =>
       prev.map((j) => (j.id === jobId ? { ...j, status: newStatus } : j))
     );
 
-    await fetch(`/api/jobs/${jobId}/status`, {
+    fetch(`/api/jobs/${jobId}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus, boardOrder: 0 }),
-    });
-    router.refresh();
+    }).catch(() => {});
   }
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      <div className="board-scroll flex gap-3 overflow-x-auto pb-4">
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {BOARD_COLUMNS.map((status) => (
           <KanbanColumn
             key={status}

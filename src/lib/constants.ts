@@ -1,5 +1,27 @@
 export const LOCAL_USER_ID = "local-user";
 
+export const SALARY_CURRENCIES = [
+  { value: "EUR", symbol: "€", label: "EUR €" },
+  { value: "USD", symbol: "$", label: "USD $" },
+] as const;
+
+export const SALARY_PERIODS = [
+  { value: "YEAR", label: "per year" },
+  { value: "MONTH", label: "per month" },
+] as const;
+
+export function formatSalary(
+  amount?: number | null,
+  currency?: string | null,
+  period?: string | null,
+  fallback?: string | null
+): string | null {
+  if (!amount) return fallback ?? null;
+  const sym = currency === "USD" ? "$" : "€";
+  const per = period === "MONTH" ? "month" : "year";
+  return `${sym}${amount.toLocaleString()} / ${per} gross`;
+}
+
 export const JOB_STATUSES = [
   "WISHLIST",
   "APPLIED",

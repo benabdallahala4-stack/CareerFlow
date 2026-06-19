@@ -85,7 +85,10 @@ model Job {
   title       String
   description String?
   url         String?
-  salary      String?
+  salary         String?
+  salaryAmount   Int?
+  salaryCurrency String?  // EUR|USD
+  salaryPeriod   String?  // YEAR|MONTH
   location    String?
   source      String?
   status       String   @default("WISHLIST") // WISHLIST|APPLIED|INTERVIEW|OFFER|REJECTED|ARCHIVED

@@ -12,6 +12,7 @@ import TailorPanel from "@/components/TailorPanel";
 import StageStepper from "@/components/StageStepper";
 import CompanyResearchPanel from "@/components/CompanyResearchPanel";
 import { requireUserId } from "@/lib/auth-helpers";
+import { formatSalary } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -54,7 +55,9 @@ export default async function JobDetail({
             <dt className="text-xs font-medium uppercase tracking-wide text-zinc-400">
               Salary
             </dt>
-            <dd className="mt-1 text-zinc-700">{job.salary || "—"}</dd>
+            <dd className="mt-1 text-zinc-700">
+              {formatSalary(job.salaryAmount, job.salaryCurrency, job.salaryPeriod, job.salary) || "—"}
+            </dd>
           </div>
           <div>
             <dt className="text-xs font-medium uppercase tracking-wide text-zinc-400">
@@ -157,7 +160,9 @@ export default async function JobDetail({
             id: job.id,
             title: job.title,
             url: job.url ?? "",
-            salary: job.salary ?? "",
+            salaryAmount: job.salaryAmount,
+            salaryCurrency: job.salaryCurrency,
+            salaryPeriod: job.salaryPeriod,
             location: job.location ?? "",
             description: job.description ?? "",
           }}
