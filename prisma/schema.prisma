@@ -21,7 +21,25 @@ model User {
   notes      Note[]
   aiSettings AiSetting[]
   aiUsage    AiUsageLog[]
-  notifications Notification[]
+  notifications    Notification[]
+  emailSuggestions EmailSuggestion[]
+}
+
+model EmailSuggestion {
+  id             String   @id @default(cuid())
+  userId         String
+  jobId          String?
+  classification String   // INTERVIEW|REJECTION|OFFER
+  proposedStatus String   // WISHLIST|APPLIED|INTERVIEW|OFFER|REJECTED|ARCHIVED
+  fromEmail      String?
+  subject        String?
+  snippet        String?
+  status         String   @default("PENDING") // PENDING|APPLIED|DISMISSED
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, status])
 }
 
 model Notification {
