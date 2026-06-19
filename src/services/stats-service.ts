@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { LOCAL_USER_ID, JOB_STATUSES, type JobStatus } from "@/lib/constants";
+import { JOB_STATUSES, type JobStatus } from "@/lib/constants";
 
 export interface Stats {
   total: number;
@@ -9,9 +9,9 @@ export interface Stats {
   interviewsThisWeek: number;
 }
 
-export async function computeStats(): Promise<Stats> {
+export async function computeStats(userId: string): Promise<Stats> {
   const jobs = await db.job.findMany({
-    where: { userId: LOCAL_USER_ID },
+    where: { userId },
     select: { status: true },
   });
 
@@ -33,7 +33,7 @@ export async function computeStats(): Promise<Stats> {
   const weekAhead = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const interviewsThisWeek = await db.interview.count({
     where: {
-      userId: LOCAL_USER_ID,
+      userId,
       scheduledAt: { gte: now, lte: weekAhead },
     },
   });

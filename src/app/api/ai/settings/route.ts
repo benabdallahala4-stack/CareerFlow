@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listAiSettings, createAiSetting } from "@/services/ai-setting-service";
 import { PROVIDERS, type ProviderName } from "@/services/ai/types";
+import { requireUserId } from "@/lib/auth-helpers";
 
 export async function GET() {
-  const settings = await listAiSettings();
+  const userId = await requireUserId();
+  const settings = await listAiSettings(userId);
   // Do not leak full keys to the client.
   return NextResponse.json(
     settings.map((s) => ({
@@ -18,11 +20,12 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const userId = await requireUserId();
   const body = await req.json();
   if (!PROVIDERS.includes(body?.provider)) {
     return NextResponse.json({ error: "valid provider required" }, { status: 400 });
   }
-  const created = await createAiSetting({
+  const created = await createAiSetting(userId, {
     provider: body.provider as ProviderName,
     apiKey: body.apiKey ?? null,
     model: body.model ?? null,

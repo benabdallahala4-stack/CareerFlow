@@ -3,11 +3,13 @@ import { db } from "@/lib/db";
 import { LOCAL_USER_ID } from "@/lib/constants";
 import { computeStats } from "@/services/stats-service";
 
+const U = LOCAL_USER_ID;
+
 async function ensureUser() {
   await db.user.upsert({
-    where: { id: LOCAL_USER_ID },
+    where: { id: U },
     update: {},
-    create: { id: LOCAL_USER_ID, email: "me@local", name: "Me" },
+    create: { id: U, email: "me@local", name: "Me" },
   });
 }
 
@@ -26,14 +28,14 @@ describe("StatsService", () => {
   it("counts by status and total", async () => {
     await db.job.createMany({
       data: [
-        { userId: LOCAL_USER_ID, title: "TEST_S_a", status: "APPLIED" },
-        { userId: LOCAL_USER_ID, title: "TEST_S_b", status: "APPLIED" },
-        { userId: LOCAL_USER_ID, title: "TEST_S_c", status: "INTERVIEW" },
-        { userId: LOCAL_USER_ID, title: "TEST_S_d", status: "OFFER" },
-        { userId: LOCAL_USER_ID, title: "TEST_S_e", status: "WISHLIST" },
+        { userId: U, title: "TEST_S_a", status: "APPLIED" },
+        { userId: U, title: "TEST_S_b", status: "APPLIED" },
+        { userId: U, title: "TEST_S_c", status: "INTERVIEW" },
+        { userId: U, title: "TEST_S_d", status: "OFFER" },
+        { userId: U, title: "TEST_S_e", status: "WISHLIST" },
       ],
     });
-    const stats = await computeStats();
+    const stats = await computeStats(U);
     expect(stats.total).toBeGreaterThanOrEqual(5);
     expect(stats.byStatus.APPLIED).toBeGreaterThanOrEqual(2);
     expect(stats.byStatus.INTERVIEW).toBeGreaterThanOrEqual(1);
@@ -43,27 +45,27 @@ describe("StatsService", () => {
   it("computes response rate within 0..100", async () => {
     await db.job.createMany({
       data: [
-        { userId: LOCAL_USER_ID, title: "TEST_S_app1", status: "APPLIED" },
-        { userId: LOCAL_USER_ID, title: "TEST_S_app2", status: "APPLIED" },
-        { userId: LOCAL_USER_ID, title: "TEST_S_iv", status: "INTERVIEW" },
-        { userId: LOCAL_USER_ID, title: "TEST_S_off", status: "OFFER" },
-        { userId: LOCAL_USER_ID, title: "TEST_S_wish", status: "WISHLIST" },
+        { userId: U, title: "TEST_S_app1", status: "APPLIED" },
+        { userId: U, title: "TEST_S_app2", status: "APPLIED" },
+        { userId: U, title: "TEST_S_iv", status: "INTERVIEW" },
+        { userId: U, title: "TEST_S_off", status: "OFFER" },
+        { userId: U, title: "TEST_S_wish", status: "WISHLIST" },
       ],
     });
-    const stats = await computeStats();
+    const stats = await computeStats(U);
     expect(stats.responseRate).toBeGreaterThanOrEqual(0);
     expect(stats.responseRate).toBeLessThanOrEqual(100);
   });
 
   it("counts interviews scheduled in the next 7 days", async () => {
     const job = await db.job.create({
-      data: { userId: LOCAL_USER_ID, title: "TEST_S_ivjob", status: "INTERVIEW" },
+      data: { userId: U, title: "TEST_S_ivjob", status: "INTERVIEW" },
     });
     const inThreeDays = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
     await db.interview.create({
-      data: { userId: LOCAL_USER_ID, jobId: job.id, type: "PHONE", scheduledAt: inThreeDays },
+      data: { userId: U, jobId: job.id, type: "PHONE", scheduledAt: inThreeDays },
     });
-    const stats = await computeStats();
+    const stats = await computeStats(U);
     expect(stats.interviewsThisWeek).toBeGreaterThanOrEqual(1);
   });
 });

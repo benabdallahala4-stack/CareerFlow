@@ -7,21 +7,20 @@ import {
   deleteNote,
 } from "@/services/note-service";
 
+const U = LOCAL_USER_ID;
 let jobId: string;
 
 async function ensureUser() {
   await db.user.upsert({
-    where: { id: LOCAL_USER_ID },
+    where: { id: U },
     update: {},
-    create: { id: LOCAL_USER_ID, email: "me@local", name: "Me" },
+    create: { id: U, email: "me@local", name: "Me" },
   });
 }
 
 beforeEach(async () => {
   await ensureUser();
-  const job = await db.job.create({
-    data: { userId: LOCAL_USER_ID, title: "TEST_NOTE_Job" },
-  });
+  const job = await db.job.create({ data: { userId: U, title: "TEST_NOTE_Job" } });
   jobId = job.id;
 });
 
@@ -32,17 +31,17 @@ afterEach(async () => {
 
 describe("NoteService", () => {
   it("creates and lists notes for a job (newest first)", async () => {
-    await createNoteForJob(jobId, "First note");
-    await createNoteForJob(jobId, "Second note");
-    const list = await listNotesForJob(jobId);
+    await createNoteForJob(U, jobId, "First note");
+    await createNoteForJob(U, jobId, "Second note");
+    const list = await listNotesForJob(U, jobId);
     expect(list.length).toBe(2);
     expect(list[0].body).toBe("Second note");
   });
 
   it("deletes a note", async () => {
-    const n = await createNoteForJob(jobId, "Delete me");
-    await deleteNote(n.id);
-    const list = await listNotesForJob(jobId);
+    const n = await createNoteForJob(U, jobId, "Delete me");
+    await deleteNote(U, n.id);
+    const list = await listNotesForJob(U, jobId);
     expect(list.length).toBe(0);
   });
 });

@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { LOCAL_USER_ID } from "@/lib/constants";
 import { activeProvidersByPriority } from "../ai-setting-service";
 import { buildAdapter } from "./adapters";
 import { runWithProviders, type RunOutcome } from "./core";
@@ -10,11 +9,12 @@ import type { FeatureName, ProviderName } from "./types";
  * falling back to the supplied rule-based text. Logs usage. Never throws.
  */
 export async function runFeature(
+  userId: string,
   feature: FeatureName,
   prompt: string,
   fallback: () => string
 ): Promise<RunOutcome> {
-  const settings = await activeProvidersByPriority();
+  const settings = await activeProvidersByPriority(userId);
   const adapters = settings.map((s) =>
     buildAdapter(s.provider as ProviderName, s.apiKey, s.model)
   );
@@ -24,7 +24,7 @@ export async function runFeature(
   if (!outcome.usedFallback && outcome.provider) {
     await db.aiUsageLog.create({
       data: {
-        userId: LOCAL_USER_ID,
+        userId,
         provider: outcome.provider,
         feature,
         tokensIn: outcome.tokensIn,

@@ -1,13 +1,18 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import { LOCAL_USER_ID } from "../src/lib/constants";
 
 const db = new PrismaClient();
 
+const DEMO_EMAIL = "demo@careerflow.local";
+const DEMO_PASSWORD = "password";
+
 async function main() {
+  const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
   await db.user.upsert({
     where: { id: LOCAL_USER_ID },
-    update: {},
-    create: { id: LOCAL_USER_ID, email: "me@local", name: "Me" },
+    update: { email: DEMO_EMAIL, passwordHash },
+    create: { id: LOCAL_USER_ID, email: DEMO_EMAIL, name: "Demo", passwordHash },
   });
 
   const count = await db.job.count({ where: { userId: LOCAL_USER_ID } });
@@ -23,7 +28,7 @@ async function main() {
     });
   }
 
-  console.log("Seed complete.");
+  console.log(`Seed complete. Demo login: ${DEMO_EMAIL} / ${DEMO_PASSWORD}`);
 }
 
 main()

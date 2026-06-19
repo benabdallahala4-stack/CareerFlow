@@ -9,11 +9,13 @@ import {
   deleteCompany,
 } from "@/services/company-service";
 
+const U = LOCAL_USER_ID;
+
 async function ensureUser() {
   await db.user.upsert({
-    where: { id: LOCAL_USER_ID },
+    where: { id: U },
     update: {},
-    create: { id: LOCAL_USER_ID, email: "me@local", name: "Me" },
+    create: { id: U, email: "me@local", name: "Me" },
   });
 }
 
@@ -24,24 +26,24 @@ afterEach(async () => {
 describe("CompanyService", () => {
   it("creates and fetches a company", async () => {
     await ensureUser();
-    const created = await createCompany({ name: "TEST_Acme", location: "Remote" });
+    const created = await createCompany(U, { name: "TEST_Acme", location: "Remote" });
     expect(created.id).toBeTruthy();
     expect(created.name).toBe("TEST_Acme");
 
-    const fetched = await getCompany(created.id);
+    const fetched = await getCompany(U, created.id);
     expect(fetched?.location).toBe("Remote");
   });
 
   it("lists, updates and deletes", async () => {
     await ensureUser();
-    const c = await createCompany({ name: "TEST_Beta" });
-    const list = await listCompanies();
+    const c = await createCompany(U, { name: "TEST_Beta" });
+    const list = await listCompanies(U);
     expect(list.some((x) => x.id === c.id)).toBe(true);
 
-    const updated = await updateCompany(c.id, { website: "https://beta.test" });
-    expect(updated.website).toBe("https://beta.test");
+    const updated = await updateCompany(U, c.id, { website: "https://beta.test" });
+    expect(updated?.website).toBe("https://beta.test");
 
-    await deleteCompany(c.id);
-    expect(await getCompany(c.id)).toBeNull();
+    await deleteCompany(U, c.id);
+    expect(await getCompany(U, c.id)).toBeNull();
   });
 });

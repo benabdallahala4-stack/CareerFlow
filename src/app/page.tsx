@@ -2,11 +2,13 @@ import { listJobs } from "@/services/job-service";
 import KanbanBoard from "@/components/KanbanBoard";
 import JobForm from "@/components/JobForm";
 import { BOARD_COLUMNS } from "@/lib/constants";
+import { requireUserId } from "@/lib/auth-helpers";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const jobs = await listJobs();
+  const userId = await requireUserId();
+  const jobs = await listJobs(userId);
   const boardJobs = jobs.map((j) => ({
     id: j.id,
     title: j.title,

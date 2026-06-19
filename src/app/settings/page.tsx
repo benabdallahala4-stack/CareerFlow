@@ -1,10 +1,12 @@
 import { listAiSettings } from "@/services/ai-setting-service";
 import AiSettingsManager from "@/components/AiSettingsManager";
+import { requireUserId } from "@/lib/auth-helpers";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const settings = await listAiSettings();
+  const userId = await requireUserId();
+  const settings = await listAiSettings(userId);
   return (
     <main className="mx-auto max-w-7xl p-6">
       <h1 className="mb-1 text-xl font-semibold tracking-tight text-zinc-900">

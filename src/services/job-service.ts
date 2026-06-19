@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { LOCAL_USER_ID, type JobStatus } from "@/lib/constants";
+import { type JobStatus } from "@/lib/constants";
 
 export interface JobInput {
   title: string;
@@ -13,49 +13,52 @@ export interface JobInput {
   cvId?: string | null;
 }
 
-export function listJobs() {
+export function listJobs(userId: string) {
   return db.job.findMany({
-    where: { userId: LOCAL_USER_ID },
+    where: { userId },
     include: { company: true },
     orderBy: [{ status: "asc" }, { boardOrder: "asc" }],
   });
 }
 
-export function getJob(id: string) {
+export function getJob(userId: string, id: string) {
   return db.job.findFirst({
-    where: { id, userId: LOCAL_USER_ID },
+    where: { id, userId },
     include: { company: true, interviews: true, notes: true },
   });
 }
 
-export function createJob(input: JobInput) {
+export function createJob(userId: string, input: JobInput) {
   return db.job.create({
-    data: { ...input, userId: LOCAL_USER_ID },
+    data: { ...input, userId },
   });
 }
 
-export function updateJob(id: string, input: Partial<JobInput>) {
-  return db.job.update({ where: { id }, data: input });
+export async function updateJob(userId: string, id: string, input: Partial<JobInput>) {
+  await db.job.updateMany({ where: { id, userId }, data: input });
+  return db.job.findFirst({ where: { id, userId } });
 }
 
 export async function updateJobStatus(
+  userId: string,
   id: string,
   status: JobStatus,
   boardOrder: number
 ) {
-  const current = await db.job.findUnique({ where: { id } });
+  const current = await db.job.findFirst({ where: { id, userId } });
   const enteringApplied = status === "APPLIED" && current?.appliedAt == null;
 
-  return db.job.update({
-    where: { id },
+  await db.job.updateMany({
+    where: { id, userId },
     data: {
       status,
       boardOrder,
       ...(enteringApplied ? { appliedAt: new Date() } : {}),
     },
   });
+  return db.job.findFirst({ where: { id, userId } });
 }
 
-export function deleteJob(id: string) {
-  return db.job.delete({ where: { id } });
+export function deleteJob(userId: string, id: string) {
+  return db.job.deleteMany({ where: { id, userId } });
 }

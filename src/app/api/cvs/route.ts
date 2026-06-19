@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { listCvs, createCv } from "@/services/cv-service";
+import { requireUserId } from "@/lib/auth-helpers";
 
 export async function GET() {
-  return NextResponse.json(await listCvs());
+  const userId = await requireUserId();
+  return NextResponse.json(await listCvs(userId));
 }
 
 export async function POST(req: NextRequest) {
+  const userId = await requireUserId();
   const contentType = req.headers.get("content-type") ?? "";
 
   // JSON path: { label, content }
@@ -16,7 +19,7 @@ export async function POST(req: NextRequest) {
     if (!body?.label) {
       return NextResponse.json({ error: "label is required" }, { status: 400 });
     }
-    const cv = await createCv({ label: body.label, content: body.content ?? null });
+    const cv = await createCv(userId, { label: body.label, content: body.content ?? null });
     return NextResponse.json(cv, { status: 201 });
   }
 
@@ -45,6 +48,6 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const cv = await createCv({ label, filePath, content });
+  const cv = await createCv(userId, { label, filePath, content });
   return NextResponse.json(cv, { status: 201 });
 }

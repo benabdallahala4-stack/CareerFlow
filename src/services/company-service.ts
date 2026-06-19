@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { LOCAL_USER_ID } from "@/lib/constants";
 
 export interface CompanyInput {
   name: string;
@@ -8,27 +7,29 @@ export interface CompanyInput {
   notes?: string | null;
 }
 
-export function listCompanies() {
+export function listCompanies(userId: string) {
   return db.company.findMany({
-    where: { userId: LOCAL_USER_ID },
+    where: { userId },
     orderBy: { name: "asc" },
   });
 }
 
-export function getCompany(id: string) {
-  return db.company.findFirst({ where: { id, userId: LOCAL_USER_ID } });
+export function getCompany(userId: string, id: string) {
+  return db.company.findFirst({ where: { id, userId } });
 }
 
-export function createCompany(input: CompanyInput) {
+export function createCompany(userId: string, input: CompanyInput) {
   return db.company.create({
-    data: { ...input, userId: LOCAL_USER_ID },
+    data: { ...input, userId },
   });
 }
 
-export function updateCompany(id: string, input: Partial<CompanyInput>) {
-  return db.company.update({ where: { id }, data: input });
+export function updateCompany(userId: string, id: string, input: Partial<CompanyInput>) {
+  return db.company.updateMany({ where: { id, userId }, data: input }).then(() =>
+    db.company.findFirst({ where: { id, userId } })
+  );
 }
 
-export function deleteCompany(id: string) {
-  return db.company.delete({ where: { id } });
+export function deleteCompany(userId: string, id: string) {
+  return db.company.deleteMany({ where: { id, userId } });
 }

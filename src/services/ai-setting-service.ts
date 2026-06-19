@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { LOCAL_USER_ID } from "@/lib/constants";
 import type { ProviderName } from "./ai/types";
 
 export interface AiSettingInput {
@@ -10,30 +9,35 @@ export interface AiSettingInput {
   priority?: number;
 }
 
-export function listAiSettings() {
+export function listAiSettings(userId: string) {
   return db.aiSetting.findMany({
-    where: { userId: LOCAL_USER_ID },
+    where: { userId },
     orderBy: { priority: "asc" },
   });
 }
 
-export function createAiSetting(input: AiSettingInput) {
+export function createAiSetting(userId: string, input: AiSettingInput) {
   return db.aiSetting.create({
-    data: { ...input, userId: LOCAL_USER_ID },
+    data: { ...input, userId },
   });
 }
 
-export function updateAiSetting(id: string, input: Partial<AiSettingInput>) {
-  return db.aiSetting.update({ where: { id }, data: input });
+export async function updateAiSetting(
+  userId: string,
+  id: string,
+  input: Partial<AiSettingInput>
+) {
+  await db.aiSetting.updateMany({ where: { id, userId }, data: input });
+  return db.aiSetting.findFirst({ where: { id, userId } });
 }
 
-export function deleteAiSetting(id: string) {
-  return db.aiSetting.delete({ where: { id } });
+export function deleteAiSetting(userId: string, id: string) {
+  return db.aiSetting.deleteMany({ where: { id, userId } });
 }
 
-export function activeProvidersByPriority() {
+export function activeProvidersByPriority(userId: string) {
   return db.aiSetting.findMany({
-    where: { userId: LOCAL_USER_ID, isActive: true },
+    where: { userId, isActive: true },
     orderBy: { priority: "asc" },
   });
 }

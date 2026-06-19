@@ -9,6 +9,7 @@ import InterviewSection from "@/components/InterviewSection";
 import NoteSection from "@/components/NoteSection";
 import MatchScorePanel from "@/components/MatchScorePanel";
 import TailorPanel from "@/components/TailorPanel";
+import { requireUserId } from "@/lib/auth-helpers";
 
 export const dynamic = "force-dynamic";
 
@@ -17,10 +18,11 @@ export default async function JobDetail({
 }: {
   params: { id: string };
 }) {
-  const job = await getJob(params.id);
+  const userId = await requireUserId();
+  const job = await getJob(userId, params.id);
   if (!job) notFound();
 
-  const cvs = await listCvs();
+  const cvs = await listCvs(userId);
 
   return (
     <main className="mx-auto max-w-3xl p-6">

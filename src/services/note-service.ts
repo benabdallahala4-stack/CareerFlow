@@ -1,19 +1,18 @@
 import { db } from "@/lib/db";
-import { LOCAL_USER_ID } from "@/lib/constants";
 
-export function listNotesForJob(jobId: string) {
+export function listNotesForJob(userId: string, jobId: string) {
   return db.note.findMany({
-    where: { jobId, userId: LOCAL_USER_ID },
+    where: { jobId, userId },
     orderBy: { createdAt: "desc" },
   });
 }
 
-export function createNoteForJob(jobId: string, body: string) {
+export function createNoteForJob(userId: string, jobId: string, body: string) {
   return db.note.create({
-    data: { jobId, body, userId: LOCAL_USER_ID },
+    data: { jobId, body, userId },
   });
 }
 
-export function deleteNote(id: string) {
-  return db.note.delete({ where: { id } });
+export function deleteNote(userId: string, id: string) {
+  return db.note.deleteMany({ where: { id, userId } });
 }

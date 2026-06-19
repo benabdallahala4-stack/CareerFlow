@@ -1,11 +1,13 @@
 import { computeStats } from "@/services/stats-service";
 import StatCard from "@/components/StatCard";
 import PipelineBar from "@/components/PipelineBar";
+import { requireUserId } from "@/lib/auth-helpers";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const stats = await computeStats();
+  const userId = await requireUserId();
+  const stats = await computeStats(userId);
 
   return (
     <main className="mx-auto max-w-7xl p-6">

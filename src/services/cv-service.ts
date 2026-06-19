@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { LOCAL_USER_ID } from "@/lib/constants";
 
 export interface CvInput {
   label: string;
@@ -8,35 +7,34 @@ export interface CvInput {
   isDefault?: boolean;
 }
 
-export function listCvs() {
+export function listCvs(userId: string) {
   return db.cv.findMany({
-    where: { userId: LOCAL_USER_ID },
+    where: { userId },
     orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
   });
 }
 
-export function getCv(id: string) {
-  return db.cv.findFirst({ where: { id, userId: LOCAL_USER_ID } });
+export function getCv(userId: string, id: string) {
+  return db.cv.findFirst({ where: { id, userId } });
 }
 
-export function createCv(input: CvInput) {
+export function createCv(userId: string, input: CvInput) {
   return db.cv.create({
-    data: { ...input, userId: LOCAL_USER_ID },
+    data: { ...input, userId },
   });
 }
 
-export function updateCv(id: string, input: Partial<CvInput>) {
-  return db.cv.update({ where: { id }, data: input });
+export async function updateCv(userId: string, id: string, input: Partial<CvInput>) {
+  await db.cv.updateMany({ where: { id, userId }, data: input });
+  return db.cv.findFirst({ where: { id, userId } });
 }
 
-export async function setDefaultCv(id: string) {
-  await db.cv.updateMany({
-    where: { userId: LOCAL_USER_ID },
-    data: { isDefault: false },
-  });
-  return db.cv.update({ where: { id }, data: { isDefault: true } });
+export async function setDefaultCv(userId: string, id: string) {
+  await db.cv.updateMany({ where: { userId }, data: { isDefault: false } });
+  await db.cv.updateMany({ where: { id, userId }, data: { isDefault: true } });
+  return db.cv.findFirst({ where: { id, userId } });
 }
 
-export function deleteCv(id: string) {
-  return db.cv.delete({ where: { id } });
+export function deleteCv(userId: string, id: string) {
+  return db.cv.deleteMany({ where: { id, userId } });
 }
