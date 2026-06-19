@@ -19,6 +19,7 @@ export default function CvManager({ cvs }: { cvs: CvRow[] }) {
   const [content, setContent] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewId, setPreviewId] = useState<string | null>(null);
 
   // A file OR pasted text (with a label) is enough to submit.
   const canSubmit = Boolean(file) || (label.trim() && content.trim());
@@ -81,41 +82,59 @@ export default function CvManager({ cvs }: { cvs: CvRow[] }) {
           <p className="text-sm text-zinc-400">No CVs yet. Upload one →</p>
         )}
         {cvs.map((cv) => (
-          <div
-            key={cv.id}
-            className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm"
-          >
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-zinc-800">{cv.label}</span>
-                {cv.isDefault && (
-                  <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-600">
-                    default
-                  </span>
+          <div key={cv.id} className="rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-zinc-800">{cv.label}</span>
+                  {cv.isDefault && (
+                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-600">
+                      default
+                    </span>
+                  )}
+                </div>
+                <div className="mt-0.5 text-xs text-zinc-400">
+                  {cv.hasFile ? "file uploaded" : cv.hasContent ? "text only" : "empty"}
+                  {" · "}
+                  {new Date(cv.createdAt).toLocaleDateString()}
+                </div>
+              </div>
+              <div className="ml-auto flex items-center gap-3 text-xs">
+                {cv.hasFile && (
+                  <button
+                    onClick={() => setPreviewId(previewId === cv.id ? null : cv.id)}
+                    className="font-medium text-indigo-600 hover:underline"
+                  >
+                    {previewId === cv.id ? "hide" : "preview"}
+                  </button>
                 )}
-              </div>
-              <div className="mt-0.5 text-xs text-zinc-400">
-                {cv.hasFile ? "file uploaded" : cv.hasContent ? "text only" : "empty"}
-                {" · "}
-                {new Date(cv.createdAt).toLocaleDateString()}
-              </div>
-            </div>
-            <div className="ml-auto flex items-center gap-3 text-xs">
-              {!cv.isDefault && (
-                <button
-                  onClick={() => makeDefault(cv.id)}
-                  className="text-indigo-600 hover:underline"
-                >
-                  set default
+                {cv.hasFile && (
+                  <a
+                    href={`/api/cvs/${cv.id}/file`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-indigo-600 hover:underline"
+                  >
+                    open
+                  </a>
+                )}
+                {!cv.isDefault && (
+                  <button onClick={() => makeDefault(cv.id)} className="text-indigo-600 hover:underline">
+                    set default
+                  </button>
+                )}
+                <button onClick={() => remove(cv.id)} className="text-zinc-400 hover:text-rose-500">
+                  delete
                 </button>
-              )}
-              <button
-                onClick={() => remove(cv.id)}
-                className="text-zinc-400 hover:text-rose-500"
-              >
-                delete
-              </button>
+              </div>
             </div>
+            {previewId === cv.id && cv.hasFile && (
+              <iframe
+                src={`/api/cvs/${cv.id}/file`}
+                title={`Preview of ${cv.label}`}
+                className="mt-3 h-[520px] w-full rounded-lg border border-zinc-200"
+              />
+            )}
           </div>
         ))}
       </section>
