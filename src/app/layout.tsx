@@ -43,6 +43,8 @@ export default function RootLayout({
               <a href="/" className="hover:text-indigo-600">Board</a>
               <a href="/dashboard" className="hover:text-indigo-600">Dashboard</a>
               <a href="/cvs" className="hover:text-indigo-600">CVs</a>
+              <a href="/assistant" className="hover:text-indigo-600">Assistant</a>
+              <a href="/settings" className="hover:text-indigo-600">Settings</a>
             </nav>
           </div>
         </header>

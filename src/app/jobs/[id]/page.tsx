@@ -7,6 +7,8 @@ import StatusBadge from "@/components/StatusBadge";
 import CvPicker from "@/components/CvPicker";
 import InterviewSection from "@/components/InterviewSection";
 import NoteSection from "@/components/NoteSection";
+import MatchScorePanel from "@/components/MatchScorePanel";
+import TailorPanel from "@/components/TailorPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -100,6 +102,11 @@ export default async function JobDetail({
             </dd>
           </div>
         </dl>
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <MatchScorePanel jobId={job.id} />
+        <TailorPanel jobId={job.id} />
       </div>
 
       <div className="mt-6">
