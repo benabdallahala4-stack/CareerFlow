@@ -8,6 +8,7 @@ interface JobFormProps {
   initial?: {
     id?: string;
     title?: string;
+    companyName?: string | null;
     url?: string;
     salaryAmount?: number | null;
     salaryCurrency?: string | null;
@@ -24,6 +25,7 @@ const inputClass =
 export default function JobForm({ initial, onDone }: JobFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initial?.title ?? "");
+  const [companyName, setCompanyName] = useState(initial?.companyName ?? "");
   const [url, setUrl] = useState(initial?.url ?? "");
   const [salaryAmount, setSalaryAmount] = useState(
     initial?.salaryAmount != null ? String(initial.salaryAmount) : ""
@@ -42,6 +44,7 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
     const amount = salaryAmount ? parseInt(salaryAmount.replace(/[^\d]/g, ""), 10) : null;
     const payload = {
       title,
+      companyName: companyName.trim() || null,
       url,
       location,
       description,
@@ -59,6 +62,7 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
     if (res.ok) {
       if (!isEdit) {
         setTitle("");
+        setCompanyName("");
         setUrl("");
         setSalaryAmount("");
         setLocation("");
@@ -77,6 +81,12 @@ export default function JobForm({ initial, onDone }: JobFormProps) {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
+      />
+      <input
+        className={inputClass}
+        placeholder="Company"
+        value={companyName}
+        onChange={(e) => setCompanyName(e.target.value)}
       />
       <input
         className={inputClass}

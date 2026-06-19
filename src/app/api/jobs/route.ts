@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listJobs, createJob } from "@/services/job-service";
+import { findOrCreateCompany } from "@/services/company-service";
 import { requireUserId } from "@/lib/auth-helpers";
 import { withinLimit } from "@/services/plan-service";
 
@@ -20,6 +21,11 @@ export async function POST(req: NextRequest) {
       { status: 402 }
     );
   }
-  const job = await createJob(userId, body);
+  const { companyName, ...rest } = body;
+  if (companyName) {
+    const c = await findOrCreateCompany(userId, companyName);
+    rest.companyId = c.id;
+  }
+  const job = await createJob(userId, rest);
   return NextResponse.json(job, { status: 201 });
 }

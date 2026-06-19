@@ -35,3 +35,12 @@ export function updateCompany(userId: string, id: string, input: Partial<Company
 export function deleteCompany(userId: string, id: string) {
   return db.company.deleteMany({ where: { id, userId } });
 }
+
+export async function findOrCreateCompany(userId: string, name: string) {
+  const trimmed = name.trim();
+  const existing = await db.company.findFirst({
+    where: { userId, name: { equals: trimmed, mode: "insensitive" } },
+  });
+  if (existing) return existing;
+  return db.company.create({ data: { userId, name: trimmed } });
+}

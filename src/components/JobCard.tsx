@@ -39,9 +39,10 @@ export function JobCardView({
         {!overlay && (
           <Link
             href={`/jobs/${job.id}`}
-            className="rounded-md px-1.5 py-0.5 text-xs text-zinc-400 opacity-0 transition hover:bg-zinc-100 hover:text-indigo-600 group-hover:opacity-100"
+            onPointerDown={(e) => e.stopPropagation()}
+            className="shrink-0 rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 transition hover:bg-indigo-100 hover:text-indigo-700"
           >
-            open
+            Open
           </Link>
         )}
       </div>

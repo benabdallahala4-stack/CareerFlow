@@ -14,6 +14,7 @@ import CompanyResearchPanel from "@/components/CompanyResearchPanel";
 import { requireUserId } from "@/lib/auth-helpers";
 import { formatSalary } from "@/lib/constants";
 import { fmtDate } from "@/lib/format";
+import DeleteJobButton from "@/components/DeleteJobButton";
 
 export const dynamic = "force-dynamic";
 
@@ -155,11 +156,15 @@ export default async function JobDetail({
       </div>
 
       <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-sm font-semibold text-zinc-800">Edit job</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-zinc-800">Edit job</h2>
+          <DeleteJobButton jobId={job.id} />
+        </div>
         <JobForm
           initial={{
             id: job.id,
             title: job.title,
+            companyName: job.company?.name ?? "",
             url: job.url ?? "",
             salaryAmount: job.salaryAmount,
             salaryCurrency: job.salaryCurrency,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getJob, updateJob, deleteJob } from "@/services/job-service";
+import { findOrCreateCompany } from "@/services/company-service";
 import { requireUserId } from "@/lib/auth-helpers";
 
 export async function GET(
@@ -18,7 +19,13 @@ export async function PATCH(
 ) {
   const userId = await requireUserId();
   const body = await req.json();
-  return NextResponse.json(await updateJob(userId, params.id, body));
+  const { companyName, ...rest } = body;
+  if (companyName !== undefined) {
+    rest.companyId = companyName?.trim()
+      ? (await findOrCreateCompany(userId, companyName)).id
+      : null;
+  }
+  return NextResponse.json(await updateJob(userId, params.id, rest));
 }
 
 export async function DELETE(
