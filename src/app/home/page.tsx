@@ -5,9 +5,11 @@ import { computeStats } from "@/services/stats-service";
 import { computeNudges } from "@/services/nudge-service";
 import { listUpcomingInterviews } from "@/services/interview-service";
 import { listRecentJobs } from "@/services/job-service";
+import { listPendingSuggestions } from "@/services/suggestion-service";
 import StatCard from "@/components/StatCard";
 import PipelineBar from "@/components/PipelineBar";
 import HomeNudges from "@/components/HomeNudges";
+import HomeSuggestions from "@/components/HomeSuggestions";
 import JobForm from "@/components/JobForm";
 
 export const dynamic = "force-dynamic";
@@ -17,11 +19,12 @@ export default async function HomePage() {
   const session = await auth();
   const name = session?.user?.name || "there";
 
-  const [stats, nudges, upcoming, recent] = await Promise.all([
+  const [stats, nudges, upcoming, recent, suggestions] = await Promise.all([
     computeStats(userId),
     computeNudges(userId),
     listUpcomingInterviews(userId, 5),
     listRecentJobs(userId, 6),
+    listPendingSuggestions(userId),
   ]);
 
   const weekAhead = Date.now() + 7 * 24 * 60 * 60 * 1000;
@@ -45,6 +48,16 @@ export default async function HomePage() {
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-6">
+          <HomeSuggestions
+            suggestions={suggestions.map((s) => ({
+              id: s.id,
+              classification: s.classification,
+              proposedStatus: s.proposedStatus,
+              fromEmail: s.fromEmail,
+              subject: s.subject,
+              jobId: s.jobId,
+            }))}
+          />
           <HomeNudges nudges={nudges} />
 
           <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
