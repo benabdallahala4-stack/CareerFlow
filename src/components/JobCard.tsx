@@ -55,7 +55,11 @@ export default function JobCard({ job }: { job: JobCardData }) {
   // No transform on the source card — the DragOverlay follows the cursor instead.
   return (
     <div ref={setNodeRef} className={isDragging ? "opacity-30" : ""}>
-      <JobCardView job={job} listeners={listeners} attributes={attributes} />
+      <JobCardView
+        job={job}
+        listeners={listeners as Record<string, unknown> | undefined}
+        attributes={attributes as unknown as Record<string, unknown>}
+      />
     </div>
   );
 }
