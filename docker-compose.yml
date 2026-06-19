@@ -1,3 +1,7 @@
+# Local dev database only. Isolated project name so it never shares a volume
+# with the production stack (docker-compose.prod.yml).
+name: careerflow_dev
+
 services:
   db:
     image: postgres:16-alpine
