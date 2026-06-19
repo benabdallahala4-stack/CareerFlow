@@ -63,3 +63,12 @@ export async function updateJobStatus(
 export function deleteJob(userId: string, id: string) {
   return db.job.deleteMany({ where: { id, userId } });
 }
+
+export function listRecentJobs(userId: string, limit: number) {
+  return db.job.findMany({
+    where: { userId },
+    include: { company: true },
+    orderBy: { updatedAt: "desc" },
+    take: limit,
+  });
+}
