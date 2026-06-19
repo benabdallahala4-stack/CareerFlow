@@ -1,0 +1,38 @@
+# CareerFlow OS — production stack (app + Postgres) for a single VPS.
+# Usage: docker compose -f docker-compose.prod.yml up -d --build
+# Requires a .env file next to this file with AUTH_SECRET and POSTGRES_PASSWORD.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: careerflow
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-careerflow}
+      POSTGRES_DB: careerflow
+    volumes:
+      - cf_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U careerflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://careerflow:${POSTGRES_PASSWORD:-careerflow}@db:5432/careerflow?schema=public
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_TRUST_HOST: "true"
+    volumes:
+      - cf_uploads:/app/uploads
+    ports:
+      - "3000:3000"
+
+volumes:
+  cf_pgdata:
+  cf_uploads:
