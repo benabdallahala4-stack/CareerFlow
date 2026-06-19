@@ -4,6 +4,7 @@ import "./globals.css";
 import { auth } from "@/auth";
 import { doSignOut } from "./auth-actions";
 import NotificationBell from "@/components/NotificationBell";
+import MainNav from "@/components/MainNav";
 import { getPlan } from "@/services/plan-service";
 
 const geistSans = localFont({
@@ -50,14 +51,7 @@ export default async function RootLayout({
 
             {session?.user ? (
               <>
-                <nav className="ml-auto flex items-center gap-4 text-sm text-zinc-600">
-                  <a href="/home" className="hover:text-indigo-600">Home</a>
-                  <a href="/board" className="hover:text-indigo-600">Board</a>
-                  <a href="/calendar" className="hover:text-indigo-600">Calendar</a>
-                  <a href="/cvs" className="hover:text-indigo-600">CVs</a>
-                  <a href="/assistant" className="hover:text-indigo-600">Assistant</a>
-                  <a href="/settings" className="hover:text-indigo-600">Settings</a>
-                </nav>
+                <MainNav />
                 {plan === "PRO" ? (
                   <a href="/billing" className="ml-4 rounded-full bg-indigo-600 px-2 py-0.5 text-xs font-medium text-white">
                     PRO
