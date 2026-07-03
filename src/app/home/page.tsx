@@ -13,6 +13,7 @@ import PipelineBar from "@/components/PipelineBar";
 import HomeNudges from "@/components/HomeNudges";
 import HomeSuggestions from "@/components/HomeSuggestions";
 import JobForm from "@/components/JobForm";
+import { DEVMASTER_URL } from "@/lib/devmaster";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,23 @@ export default async function HomePage() {
         Welcome back, <span className="brand-text">{name}</span>
       </h1>
       <p className="mt-0.5 text-sm text-zinc-500">Here&apos;s your job search at a glance.</p>
+
+      <a
+        href={`${DEVMASTER_URL}/interview`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-6 flex items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 p-5 shadow-sm shadow-violet-600/20 transition hover:from-indigo-500 hover:to-violet-500"
+      >
+        <div>
+          <h2 className="text-base font-semibold text-white">Prep for your interviews on DevMaster Hub</h2>
+          <p className="mt-0.5 text-sm text-indigo-100">
+            Mock interviews, 90+ deep-dive engineering topics, and coding challenges — sharpen up before the real thing.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-indigo-700 shadow-sm">
+          Start learning →
+        </span>
+      </a>
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Applications" value={stats.total} accent="indigo" />
