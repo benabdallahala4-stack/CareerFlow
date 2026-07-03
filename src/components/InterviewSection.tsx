@@ -11,6 +11,7 @@ import {
   type InterviewStage,
 } from "@/lib/constants";
 import { fmtDateTime } from "@/lib/format";
+import { buildInterviewPrepUrl } from "@/lib/devmaster";
 
 export interface InterviewRow {
   id: string;
@@ -26,9 +27,11 @@ const inputClass =
 
 export default function InterviewSection({
   jobId,
+  jobTitle,
   interviews,
 }: {
   jobId: string;
+  jobTitle: string;
   interviews: InterviewRow[];
 }) {
   const router = useRouter();
@@ -161,6 +164,15 @@ export default function InterviewSection({
                         <option key={o} value={o}>{o}</option>
                       ))}
                     </select>
+                    <a
+                      href={buildInterviewPrepUrl(iv.type, jobTitle)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Open a tailored mock interview in DevMaster Hub"
+                      className="text-xs font-medium text-indigo-500 hover:text-indigo-700"
+                    >
+                      Prep →
+                    </a>
                     <button onClick={() => startEdit(iv)} className="text-xs text-zinc-400 hover:text-indigo-600">
                       edit
                     </button>

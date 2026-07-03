@@ -134,6 +134,7 @@ export default async function JobDetail({
       <div className="mt-6">
         <InterviewSection
           jobId={job.id}
+          jobTitle={job.title}
           interviews={job.interviews.map((iv) => ({
             id: iv.id,
             type: iv.type,

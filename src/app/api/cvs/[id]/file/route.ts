@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
 import path from "path";
 import { getCv } from "@/services/cv-service";
 import { requireUserId } from "@/lib/auth-helpers";
+import { isRemoteCvFile, readLocalCvFile } from "@/lib/cv-storage";
 
 const TYPES: Record<string, string> = {
   ".pdf": "application/pdf",
@@ -25,17 +25,15 @@ export async function GET(
     return NextResponse.json({ error: "no file for this CV" }, { status: 404 });
   }
 
-  // filePath is "uploads/<sanitized-name>" — keep it inside the uploads dir.
-  const uploadsDir = path.join(process.cwd(), "uploads");
-  const abs = path.join(process.cwd(), cv.filePath);
-  if (!abs.startsWith(uploadsDir)) {
-    return NextResponse.json({ error: "invalid path" }, { status: 400 });
+  // Remotely stored (Vercel Blob): ownership is verified above, so hand off to the Blob URL.
+  if (isRemoteCvFile(cv.filePath)) {
+    return NextResponse.redirect(cv.filePath);
   }
 
   try {
-    const data = await readFile(abs);
+    const data = await readLocalCvFile(cv.filePath);
     const ext = path.extname(cv.filePath).toLowerCase();
-    return new NextResponse(data, {
+    return new NextResponse(new Uint8Array(data), {
       headers: {
         "Content-Type": TYPES[ext] ?? "application/octet-stream",
         "Content-Disposition": `inline; filename="${path.basename(cv.filePath)}"`,

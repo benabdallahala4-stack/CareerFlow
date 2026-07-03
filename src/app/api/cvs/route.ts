@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import { listCvs, createCv } from "@/services/cv-service";
 import { requireUserId } from "@/lib/auth-helpers";
 import { withinLimit } from "@/services/plan-service";
+import { saveCvFile } from "@/lib/cv-storage";
 
 export async function GET() {
   const userId = await requireUserId();
@@ -43,11 +42,7 @@ export async function POST(req: NextRequest) {
 
     if (file && file.size > 0) {
       const bytes = Buffer.from(await file.arrayBuffer());
-      const uploadsDir = path.join(process.cwd(), "uploads");
-      await mkdir(uploadsDir, { recursive: true });
-      const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-      await writeFile(path.join(uploadsDir, safeName), bytes);
-      filePath = `uploads/${safeName}`;
+      filePath = await saveCvFile(bytes, file.name, file.type);
 
       if (file.type.startsWith("text/") || /\.(txt|md)$/i.test(file.name)) {
         content = bytes.toString("utf-8");
